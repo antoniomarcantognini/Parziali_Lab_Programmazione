@@ -1,0 +1,672 @@
+ /*
+FORMATO DELLA FUNZIONE
+void GestioneUtentiMenu(Utente* database_utenti, int* utenti_inseriti, int* capacita_attuale_utenti);
+*/
+
+
+// SOLO PER TEST //
+
+# include <stdio.h>
+# include <string.h>
+# include <stdlib.h>
+# include <ctype.h>
+
+typedef struct {
+    char codice_ISBN[18];
+    char titolo[101];
+    char autore[51];
+    int anno_pubblicazione;
+    int numero_copie;
+    char genere[31];
+} Libro;
+
+typedef struct {
+    int codice_utente;
+    char nome[51];
+    char cognome[51];
+    char email[81];
+    char data_iscrizione[11];
+} Utente;
+
+typedef struct {
+    int codice_prestito;
+    char codice_ISBN_libro[18];
+    char data_prestito[11];
+    char data_restituzione_prevista[11];
+    int restituito;
+} Prestito;
+
+// SOLO PER TEST //
+
+
+
+// == PROTOTIPI PER LA FUNZIONE == //
+
+// Prototipi per inseirmento utente
+Utente* inserisci_nuovo_utente(Utente* database_utenti,int* utenti_inseriti,int* capacita_utenti_attuale);
+int inserimento_dati_utenti(Utente* database_utenti,int* utenti_inseriti);
+int inserimento_codice_utente(Utente* database_utenti,int* utenti_inseriti);
+void inserimento_data_iscrizione(Utente* database_utenti,int* utenti_inseriti);
+void inserimento_email(Utente* database_utenti,int* utenti_inseriti);
+int menu_codice_utente();
+int invalida_data(char* data);
+
+// Prototipi per visualizzazione degli utenti
+void visualizza_tutti_gli_utenti(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_alfabetico_nomi(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_alfabetico_cognomi(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_email(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_codice_utente(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_data_iscrizione(Utente* database_utenti,int utenti_inseriti);
+void stampa_dati_utenti(Utente* database_utenti, int utenti_inseriti, int* indici_ordinati);
+
+// Prototipi per ricerca utente
+void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti);
+
+int main() {
+    // SOLO PER TEST
+    Utente* database_utenti=malloc(5*sizeof(Utente));
+    if (database_utenti==NULL) {
+        return 1;
+    }
+    int numero_utenti_inseriti=0;
+    int* utenti_inseriti = &numero_utenti_inseriti;
+    int numero_capacita_utenti_attuale=5;
+    int* capacita_utenti_attuale = &numero_capacita_utenti_attuale;
+    // SOLO PER TEST
+    
+    int scelta;
+    do { 
+        // Stampa menù gestione utenti
+        printf("=== MENU GESTIONE UTENTI ===\n");
+        printf("  1. Inserisci nuovo utente;\n");
+        printf("  2. Visualizza tutti gli utenti;\n");
+        printf("  3. Cerca utente per codice.\n");
+        printf("  4. Torna al menù principale.\n");
+        printf("\nTua scelta: ");
+        scanf("%d",&scelta);
+
+        // Switch menù:
+        if (*utenti_inseriti!=0 || scelta == 1 || scelta==4) {
+                switch (scelta)
+            {
+            case 1:
+                Utente* temp;
+                temp = inserisci_nuovo_utente(database_utenti,utenti_inseriti,capacita_utenti_attuale);
+                if (temp == NULL) {
+                    printf("Errore di allocazione in memoria! Verrai reindirizzato al menù principale\n");
+                } else {
+                    database_utenti = temp;
+                    free(temp);
+                }
+                break;
+        
+            case 2:
+                visualizza_tutti_gli_utenti(database_utenti,*utenti_inseriti);
+                break;
+
+            case 3:
+                cerca_utente_per_codice(database_utenti,*utenti_inseriti);
+                break;
+
+            case 4:
+                break;
+
+            default:
+                printf("Errore nell'inserimento della scelta! Deve essere 1, 2 o 3\n");
+                printf("Riprova:\n");
+                break;
+            }
+        } else {
+            printf("Non ci sono utenti inseriti, dunque non è possibile fare alcuna azione diversa dalla 1! Riprova:\n");
+        }
+    } while (scelta != 4);
+    
+    // SOLO PER TEST
+    free(database_utenti);
+    // SOLO PER TEST
+
+    return 0;
+}
+
+/*
+    == INSERIMENTO UTENTI ==
+*/
+
+Utente* inserisci_nuovo_utente(Utente *database_utenti, int *utenti_inseriti, int *capacita_utenti_attuale) {
+// Assegnare a questa funzione una variabile Utente temporanea su cui caricare la riallocazione dinamica del database utenti.
+
+    // Riallocazione dinamica
+    if (*utenti_inseriti == *capacita_utenti_attuale) {
+        database_utenti = realloc(database_utenti,sizeof(Utente)*2*(*capacita_utenti_attuale));
+        if (database_utenti == NULL) { // Per risparmiare tempo, in caso di errore di allocazione esco subito dalla funzione
+            return NULL;
+        }
+        *capacita_utenti_attuale = 2* *capacita_utenti_attuale;
+    }
+    
+    // Inserimento dati del nuovo utente
+    int exit_flag;
+    exit_flag=inserimento_dati_utenti(database_utenti,utenti_inseriti);
+    if (exit_flag == 0) {
+        printf("\nUtente inserito correttamente!\n\n");
+    }
+    return database_utenti;
+}
+
+int inserimento_dati_utenti(Utente* database_utenti,int* utenti_inseriti) {    
+
+    // Inserimento codice utente
+    int exit_flag;
+    exit_flag = inserimento_codice_utente(database_utenti,utenti_inseriti);
+    if (exit_flag == 1) { // Controllo uscita da inserimento dati
+        return 1;
+    }
+
+    // Inserimento nome e cognome
+    printf("  - Nome: ");
+    scanf("%50s",database_utenti[*(utenti_inseriti)].nome);
+    printf("  - Cognome: ");
+    scanf("%50s",database_utenti[*(utenti_inseriti)].cognome);
+
+    // Inserimento data
+    inserimento_data_iscrizione(database_utenti,utenti_inseriti);
+
+    // Inserimento e-mail
+    inserimento_email(database_utenti,utenti_inseriti);
+    
+    (*utenti_inseriti)++;
+    return 0; 
+}
+
+int menu_codice_utente() {
+
+    int scelta=0; // Se il codice è già esistente faccio scegliere all'utente se fare un altro inserimento o uscire dall'inserimento utenti.
+    printf("\nIl codice utente inserito è già esistente!\n");
+    printf("\nCosa vuoi fare?\n");
+    printf("1. Inserire un altro utente;\n");
+    printf("2. Uscire dall'inserimento utenti.\n");
+    do { // Controllo inserimento scelta corretto
+        printf("\nLa tua scelta: \n");
+        scanf("%d",&scelta);
+        switch (scelta)
+        {
+        case 1:
+            return 0;
+            break;
+        
+        case 2:
+            return 1;
+            break;
+
+        default:
+            printf("Devi inserire un numero tra 1 e 2!");
+            printf("Riprova:\n");
+            break; 
+        } 
+    } while (scelta != 1 && scelta != 2);
+}
+
+int inserimento_codice_utente(Utente* database_utenti, int* utenti_inseriti) {
+    int flag_codice_utente;
+    int temp;
+
+    do { // Questo ciclo ricomincia se il codice non è univoco
+        printf("Inserisci i dati dell'utente: \n");
+        printf("  - Codice utente: ");
+        do {
+            scanf("%d",&temp);
+            if(temp<=0) {
+            printf("Il codice utente deve essere positivo! Riprova: ");
+            }
+        } while (temp<=0);
+        int i=0;
+        do { // Controllo del codice univoco
+            flag_codice_utente=0;
+            if (temp == database_utenti[i].codice_utente) {
+                flag_codice_utente++;
+                int exit_flag = menu_codice_utente();
+                if (exit_flag == 1) { // Se exit_flag è 1, allora devo uscire dalla funzione inserimento_dati_utenti
+                    return 1;
+                }
+            }
+            i++;
+        } while (flag_codice_utente == 0 && i < *(utenti_inseriti));
+        i=0;
+    } while (flag_codice_utente != 0);
+
+    database_utenti[*(utenti_inseriti)].codice_utente = temp;
+    return 0;
+}
+
+void inserimento_data_iscrizione(Utente* database_utenti, int* utenti_inseriti) {
+    char data[11];
+    
+    do { // Controllo inserimento corretto
+        printf("  - Data di iscrizione: ");
+        scanf("%10s",data);
+
+        // Avvertimento per inserimento errato
+        if (invalida_data(data)) {
+            printf("Il formato della data deve essere gg/mm/aaaa!\n");
+            printf("Riprova:\n");
+        }
+    } while (invalida_data(data));
+
+    // Copia nel database
+    strcpy(database_utenti[*(utenti_inseriti)].data_iscrizione,data);
+}
+
+int ins(char *data) {
+    if (strlen(data)!=10) {
+        return 1;
+    }
+    return  data[0] < '0' || data[0] > '9' ||
+            data[1] < '0' || data[1] > '9' ||
+            data[3] < '0' || data[3] > '9' ||
+            data[4] < '0' || data[4] > '9' ||
+            data[6] < '0' || data[6] > '9' ||
+            data[7] < '0' || data[7] > '9' ||
+            data[8] < '0' || data[8] > '9' ||
+            data[9] < '0' || data[9] > '9' ||
+            data[2] != '/' || data[5] != '/';
+}
+
+void inserimento_email(Utente* database_utenti,int* utenti_inseriti) {
+    char email[81];
+    
+    do { // Controllo inserimento corretto
+        printf("  - Email: ");
+        scanf("%s",email);
+
+        // Avvertimento per inserimento errato
+        if (strchr(email,'@') == NULL) {
+        printf("E' obbligatorio inserire una chiocciola (@)!\n");
+        printf("Riprova:\n");
+        }   
+
+    } while (strchr(email,'@') == NULL);
+    
+    // Copia nel database
+    strcpy(database_utenti[*(utenti_inseriti)].email,email);
+}
+
+/*
+  == VISUALIZZAZIONE UTENTI ==
+*/
+
+void visualizza_tutti_gli_utenti(Utente* database_utenti,int utenti_inseriti) {
+    
+    int scelta = 0;
+    
+    do {
+        // Stampa Menù visualizzazione utenti
+        printf("== MENÙ VISUALIZZAZIONE UTENTI ==\n");
+        printf("  1. Ordine - alfabetico (nomi - cognomi);\n");
+        printf("  2. Ordine - alfabetico (cognomi - nomi);\n");
+        printf("  3. Ordine - alfanumerico (email);\n");
+        printf("  4. Ordine - numerico (codice utente);\n");
+        printf("  5. Ordine - temporale (iscrizione);\n");
+        printf("  6. Torna al menù gestione utenti.\n");    
+        printf("\nLa tua scelta: ");
+        scanf("%d", &scelta);
+
+        // Switch menù
+        switch (scelta)
+        {
+        case 1:
+            stampa_ordine_alfabetico_nomi(database_utenti,utenti_inseriti);
+            break;
+
+        case 2:
+            stampa_ordine_alfabetico_cognomi(database_utenti,utenti_inseriti);
+            break;
+
+        case 3:
+            stampa_ordine_email(database_utenti,utenti_inseriti);
+            break;
+
+        case 4:
+            stampa_ordine_codice_utente(database_utenti,utenti_inseriti);
+            break;
+    
+        case 5:
+            stampa_ordine_data_iscrizione(database_utenti,utenti_inseriti);
+            break;
+    
+        case 6:
+            break;
+
+        default:
+            printf("La tua scelta deve essere un numero tra 1 e 6 (compresi)! Riprova:\n");
+            break;
+        }
+
+    } while (scelta != 6);
+}
+
+int stampa_ordine_alfabetico_nomi(Utente* database_utenti,int utenti_inseriti) {
+    
+    // Inizializzazione vettore degli indici
+    int* indici_ordinati = malloc(utenti_inseriti*sizeof(int));
+    if (indici_ordinati==NULL) {
+        return 1;
+    }
+    for (int i=0;i<utenti_inseriti;i++) {
+        indici_ordinati[i]=i;
+    }
+
+    // Creazione stringhe nome - cognome in lettere minuscole
+    char (*nomi_cognomi)[102]=malloc(utenti_inseriti*sizeof(*nomi_cognomi));
+    if (nomi_cognomi==NULL) {
+        free(indici_ordinati);
+        return 1;
+    }
+    for (int i=0;i<utenti_inseriti;i++) {
+        strcpy(nomi_cognomi[i],database_utenti[i].nome);
+        strcat(nomi_cognomi[i]," ");
+        strcat(nomi_cognomi[i],database_utenti[i].cognome);
+        for (int j=0;j<strlen(nomi_cognomi[i]);j++) {
+            nomi_cognomi[i][j] = (char) tolower((unsigned char) nomi_cognomi[i][j]);
+        }
+    }
+
+    // Ordinamento vettore degli indici
+    for (int i=0;i<utenti_inseriti-1;i++) {
+        for (int j=utenti_inseriti-1;j>i;j--) {
+            if (strcmp(nomi_cognomi[indici_ordinati[i]],nomi_cognomi[indici_ordinati[j]])>0) {
+                int temp;
+                temp = indici_ordinati[i];
+                indici_ordinati[i] = indici_ordinati[j];
+                indici_ordinati[j] = temp;
+            }
+        }
+    }
+
+    // Stampa utenti
+    stampa_dati_utenti(database_utenti,utenti_inseriti,indici_ordinati);
+
+    free(indici_ordinati);
+    free(nomi_cognomi);
+    return 0;
+}
+
+int stampa_ordine_alfabetico_cognomi(Utente* database_utenti,int utenti_inseriti) {
+    
+    // Inizializzazione vettore degli indici
+    int* indici_ordinati = malloc(utenti_inseriti*sizeof(int));
+    if (indici_ordinati == NULL) {
+        return 1;
+    }
+    for (int i=0;i<utenti_inseriti;i++) {
+        indici_ordinati[i]=i;
+    }
+
+    // Creazione stringhe nome - cognome in lettere minuscole
+    char (*cognomi_nomi)[102]=malloc(utenti_inseriti*sizeof(*cognomi_nomi));
+    if (cognomi_nomi==NULL) {
+        free(indici_ordinati);
+        return 1;
+    }
+    for (int i=0;i<utenti_inseriti;i++) {
+        strcpy(cognomi_nomi[i],database_utenti[i].cognome);
+        strcat(cognomi_nomi[i]," ");
+        strcat(cognomi_nomi[i],database_utenti[i].nome);
+        int lunghezza=strlen(cognomi_nomi[i]);
+        for (int j=0;j<lunghezza;j++) {
+            cognomi_nomi[i][j] = (char) tolower((unsigned char)cognomi_nomi[i][j]);
+        }
+    }
+
+    // Ordinamento vettore degli indici
+    for (int i=0;i<utenti_inseriti-1;i++) {
+        for (int j=utenti_inseriti-1;j>i;j--) {
+            if (strcmp(cognomi_nomi[indici_ordinati[i]],cognomi_nomi[indici_ordinati[j]])>0) {
+                int temp;
+                temp = indici_ordinati[i];
+                indici_ordinati[i] = indici_ordinati[j];
+                indici_ordinati[j] = temp;
+            }
+        }
+    }
+
+    // Stampa utenti
+    stampa_dati_utenti(database_utenti,utenti_inseriti,indici_ordinati);
+
+    free(indici_ordinati);
+    free(cognomi_nomi);
+    return 0;
+}
+
+int stampa_ordine_email(Utente* database_utenti,int utenti_inseriti) {
+    
+    // Inizializzazione vettore degli indici
+    int* indici_ordinati = malloc(utenti_inseriti*sizeof(int));
+    if (indici_ordinati==NULL) {
+        return 1;
+    }
+    for (int i=0;i<utenti_inseriti;i++) {
+        indici_ordinati[i]=i;
+    }
+    
+    // Ordinamento vettore degli indici
+    for (int i=0;i<utenti_inseriti-1;i++) {
+        for (int j=utenti_inseriti-1;j>i;j--) {
+            if (strcmp(database_utenti[indici_ordinati[i]].email,database_utenti[indici_ordinati[j]].email)>0) {
+                int temp;
+                temp = indici_ordinati[i];
+                indici_ordinati[i] = indici_ordinati[j];
+                indici_ordinati[j] = temp;
+            }
+        }
+    }
+    
+    // Stampa utenti
+    stampa_dati_utenti(database_utenti,utenti_inseriti,indici_ordinati);
+
+    free(indici_ordinati);
+    return 0;
+}
+
+int stampa_ordine_codice_utente(Utente* database_utenti,int utenti_inseriti) {
+    
+    // Inizializzazione vettore degli indici
+    int* indici_ordinati = malloc(utenti_inseriti*sizeof(int));
+    if (indici_ordinati==NULL) {
+        return 1;
+    }
+    for (int i=0;i<utenti_inseriti;i++) {
+        indici_ordinati[i]=i;
+    }
+    
+    // Ordinamento vettore degli indici
+    for (int i=0;i<utenti_inseriti-1;i++) {
+        for (int j=utenti_inseriti-1;j>i;j--) {
+            if (database_utenti[indici_ordinati[i]].codice_utente > database_utenti[indici_ordinati[j]].codice_utente) {
+                int temp;
+                temp = indici_ordinati[i];
+                indici_ordinati[i] = indici_ordinati[j];
+                indici_ordinati[j] = temp;
+            }
+        }
+    }
+    
+    // Stampa dati utenti
+    stampa_dati_utenti(database_utenti,utenti_inseriti,indici_ordinati);
+
+    free(indici_ordinati);
+    return 0;
+}
+
+int stampa_ordine_data_iscrizione(Utente* database_utenti,int utenti_inseriti) {
+    
+    // Inizializzazione vettore degli indici
+    int* indici_ordinati = malloc(utenti_inseriti*sizeof(int));
+    if (indici_ordinati==NULL) {
+        return 1;
+    }
+    for (int i=0;i<utenti_inseriti;i++) {
+        indici_ordinati[i]=i;
+    }
+
+    // Dichiarazione anno,mese,giorno
+    int* giorno=malloc(utenti_inseriti*sizeof(int));
+    if (giorno == NULL) {
+        free(indici_ordinati);
+        return 1;
+    }
+    int* anno=malloc(utenti_inseriti*sizeof(int));
+    if (anno == NULL) {
+        free(indici_ordinati);
+        free(giorno);
+        return 1;
+    }
+    int* mese=malloc(utenti_inseriti*sizeof(int));
+    if (mese == NULL) {
+        free(indici_ordinati);
+        free(giorno);
+        free(anno);
+        return 1;
+    }
+
+    // Calcolo anno
+    for (int i=0;i<utenti_inseriti;i++) {
+        char temp[5];
+        for (int j=0;j<4;j++) {
+            temp[j] = database_utenti[i].data_iscrizione[6+j];
+        }
+        anno[i]=(temp[0]-'0')*1000;
+        anno[i]+=(temp[1]-'0')*100;
+        anno[i]+=(temp[2]-'0')*10;
+        anno[i]+=(temp[3]-'0');
+    }
+    
+    // Calcolo mese
+    for (int i=0;i<utenti_inseriti;i++) {
+        char temp[3];
+        for (int j=0;j<2;j++) {
+            temp[j] = database_utenti[i].data_iscrizione[3+j];
+        }
+        mese[i]=(temp[0]-'0')*10;
+        mese[i]+=(temp[1]-'0');
+    }
+
+    // Calcolo giorno
+    for (int i=0;i<utenti_inseriti;i++) {
+        char temp[3];
+        for (int j=0;j<2;j++) {
+            temp[j] = database_utenti[i].data_iscrizione[j];
+        }
+        giorno[i]=(temp[0]-'0')*10;
+        giorno[i]+=(temp[1]-'0');
+    }
+
+    int* valore_data=malloc(utenti_inseriti*sizeof(int));
+    if (valore_data==NULL) {
+        free(indici_ordinati);
+        free(giorno);
+        free(mese);
+        free(anno);
+        return 1;
+    }
+    for (int i=0;i<utenti_inseriti;i++) {
+        valore_data[i]=anno[i]*10000 + mese[i]*100 + giorno[i]; 
+    }
+    
+    // Ordinamento vettore degli indici
+    for (int i=0;i<utenti_inseriti-1;i++) {
+        for (int j=utenti_inseriti-1;j>i;j--) {
+            if (valore_data[i]>valore_data[j]) {
+                int temp;
+                temp = indici_ordinati[i];
+                indici_ordinati[i] = indici_ordinati[j];
+                indici_ordinati[j] = temp;
+            }
+        }
+    }
+    
+    // Stampa dati utenti
+    stampa_dati_utenti(database_utenti,utenti_inseriti,indici_ordinati);
+
+    // Liberazione memoria
+    free(indici_ordinati);
+    free(giorno);
+    free(mese);
+    free(anno);
+    free(valore_data);
+    return 0;
+}
+
+void stampa_dati_utenti(Utente* database_utenti, int utenti_inseriti, int* indici_ordinati) {
+    for (int i=0;i<utenti_inseriti;i++) {
+        printf("\nUtente %d:\n",i+1);
+        printf("  Nome: %s\n",database_utenti[indici_ordinati[i]].nome);
+        printf("  Cognome: %s\n",database_utenti[indici_ordinati[i]].cognome);
+        printf("  Email: %s\n",database_utenti[indici_ordinati[i]].email);
+        printf("  Codice utente: %d\n",database_utenti[indici_ordinati[i]].codice_utente);
+        printf("  Data di iscrizione: %s\n",database_utenti[indici_ordinati[i]].data_iscrizione);
+    }
+}
+
+/*
+   == RICERCA UTENTI TRAMITE CODICE UTENTE == 
+*/
+
+void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti) {
+
+    int src_flag=-1;
+    do {
+        
+        // Inserimento codice utente
+        int codice_inserito;
+        printf("Inserisci il codice utente: ");
+        scanf("%d",&codice_inserito);
+
+        // Ricerca codice utente
+        for (int i=0;i<utenti_inseriti;i++) {
+            if (database_utenti[i].codice_utente == codice_inserito) {
+                src_flag=i;
+                break;
+            }
+        }
+
+        // Stampa dati utente	
+        if (src_flag==-1) { // Se l'utente non è stato trovato, è possibile inserirne un altro oppure tornare alla gestione utenti
+            int scelta;
+            printf("\nNon è stato trovato alcun utente con il codice inserito!\n");
+            printf("Cosa vuoi fare?\n");
+            printf("\n  1. Inserire un altro codice utente;\n");
+            printf("  2. Tornare al menù gestione utenti.\n");
+            printf("\nLa tua scelta: ");
+            do { // Ciclo per la scelta dell'utente
+                
+                // Inserimento scelta
+                scanf("%d",&scelta);
+                
+                // Switch scelta utente
+                switch (scelta)
+                {
+                case 1:
+                    break;
+            
+                case 2:
+                    return;
+
+                default:
+                    printf("La tua scelta deve essere 1 oppure 2! Riprova:\n");
+                    printf("\nLa tua scelta: ");
+                    break;
+                }
+            } while (scelta!=1 && scelta != 2);
+        } else { // Se l'utente viene trovato, vengono stampati i suoi dati.
+            printf("Utente trovato!\n");
+            printf("  Nome: %s\n",database_utenti[src_flag].nome);
+            printf("  Cognome: %s\n",database_utenti[src_flag].cognome);
+            printf("  Email: %s\n",database_utenti[src_flag].email);
+            printf("  Codice utente: %d\n",database_utenti[src_flag].codice_utente);
+            printf("  Data di iscrizione: %s\n",database_utenti[src_flag].data_iscrizione);
+            printf("\nVerrai, ora, indirizzato al menù gestione utenti.");
+        }
+    } while (src_flag == -1);
+
+}
