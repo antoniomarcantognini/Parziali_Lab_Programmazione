@@ -30,6 +30,73 @@ typedef struct {
 } Prestito;
 
 
+// prototipi delle funzioni
+void menuGestioneLibri(Libro **libri, int *ptrNumLibri, int *ptrCapLibri, int numLibri);   // numLibri è il valore del puntatore!!
+
+Libro* inserisciNuovoLibro(Libro *libri, int *ptrNumLibri, int *ptrCapLibri);
+void visualizzaTuttiILibri(Libro *libri, int numLibri);
+void cercaLibroPerISBN(Libro *libri,int numLibri);
+int formatoCorrettoISBN(char *s);
+void cercaLibriPerAutore(Libro *libri,int numLibri);
+void libriDisponibiliPerPrestito(Libro *libri,int numLibri);
+
+// Registrazione prestiti
+void menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestito* database_prestiti,int* utenti_inseriti, int* libri_inseriti,int* prestiti_inseriti,int* capacita_attuale_prestiti);
+
+Prestito* registra_prestito(Libro* database_libri,Utente* database_utenti,Prestito* database_prestiti,int* prestiti_inseriti,int* capacita_attuale_prestiti,int libri_inseriti,int utenti_inseriti);
+void richiedi_libro_utente(Libro* database_libri,Utente* database_utenti,int* utenti_inseriti,int libri_inseriti,int*posizione_utente,int* posizione_libro);    
+
+// Richiesta libro
+int richiesta_codice_ISBN(Libro* database_libri,int libri_inseriti,char ISBN[],int* posizione_libro);
+int invalida_ISBN(char ISBN[18]);
+int invalida_data(char data[11]);
+void controlla_esistenza_libro(Libro* database_libri,int libri_inseriti,char ISBN[],int* posizione_libro);
+int menu_codice_ISBN_non_valido();
+// Richiesta utente
+void richiesta_codice_utente(Utente* database_utenti, int utenti_inseriti, int* codice, int* posizione_utente);
+void controlla_esistenza_utente(Utente* database_utenti,int utenti_inseriti,int codice,int* posizione_utente);
+int menu_codice_utente_non_valido();
+// Calcolo data di restituzione
+void calcola_30_giorni_dopo(char data[]);
+void estrapola_data_numerica(char data[],int* anno, int* mese, int* giorno);
+int calcola_data_valore(int* anno,int* mese, int* giorno);
+void costruisci_data_da_valore_data(int data_valore,int* anno, int* mese, int* giorno);
+void costruisci_stringa_da_data(char data[],int anno,int mese,int giorno);
+
+// Registrazione restituzioni
+void registra_restituzione(Prestito* database_prestiti, Libro* database_libri,int prestiti_inseriti,int libri_inseriti);
+int menu_codice_prestito_errato();
+
+// Visualizzazione dei prestiti attivi
+void visualizza_prestiti_attivi(Utente* database_utenti,Prestito* database_prestiti,Libro* database_libri,int libri_inseriti,int prestiti_inseriti,int utenti_inseriti);
+
+// Visualizzazione storico dei prestiti
+void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* database_prestiti,int utenti_inseriti,int prestiti_inseriti);
+void stampa_prestito(Prestito* database_prestiti,int indice_prestito_assoluto,int indice_prestito_nel_ciclo_specifico);
+
+// Prototipi per inseirmento utente
+Utente* inserisci_nuovo_utente(Utente* database_utenti,int* utenti_inseriti,int* capacita_utenti_attuale);
+int inserimento_dati_utenti(Utente* database_utenti,int* utenti_inseriti);
+int inserimento_codice_utente(Utente* database_utenti,int* utenti_inseriti);
+void inserimento_data_iscrizione(Utente* database_utenti,int* utenti_inseriti);
+void inserimento_email(Utente* database_utenti,int* utenti_inseriti);
+int menu_codice_utente();
+int invalida_data(char* data);
+
+// Prototipi per visualizzazione degli utenti
+void menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capacita_attuale_utenti);
+void visualizza_tutti_gli_utenti(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_alfabetico_nomi(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_alfabetico_cognomi(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_email(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_codice_utente(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_data_iscrizione(Utente* database_utenti,int utenti_inseriti);
+void stampa_dati_utenti(Utente* database_utenti, int utenti_inseriti, int* indici_ordinati);
+
+// Prototipi per ricerca utente
+void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti);
+
+
 int main(){
 // funzione menu principale:
 // dichiaro le variabili fuori dal do-while
@@ -37,7 +104,7 @@ int main(){
     Utente *utenti = NULL;
     Prestito *prestiti = NULL;
         
-    int capacitaMaxLibri = 5;   // parto da 5 e poi la raddoppio mano a mano
+    int capacitaMaxLibri = 5;   // parto da 5 e poi la raddoppio nel realloc
     int* ptrCapLibri = &capacitaMaxLibri;
         
     int capacitaMaxUtenti = 5;
@@ -94,18 +161,18 @@ do{
 
     switch (scelta1)
     {
-    case 'A':
+        case 'A':
             // CHIAMATA ALLA FUNZIONE: Qui avviene il cambiamento.
             // Non passiamo il valore di 'libri' (l'indirizzo che contiene),
             // ma passiamo L'INDIRIZZO DELLA VARIABILE 'libri' STESSA.
             // Usiamo l'operatore '&' per ottenere l'indirizzo del puntatore.
-        menuGestioneLibri(&libri, ptrNumLibri, ptrCapLibri, *ptrNumLibri);  // passo il valore del puntatore che ho incrementato nella funzione inserisci libro, permetendo alla funzione di modificarla
-        break;
+            menuGestioneLibri(&libri, ptrNumLibri, ptrCapLibri, *ptrNumLibri);  // passo il valore del puntatore che ho incrementato nella funzione inserisci libro, permetendo alla funzione di modificarla
+            break;
          case 'B':
-            menuGestioneUtenti(&utenti, ptrNumUtenti, ptrCapUtenti); // passo l'indirizzo di utenti (& aggiunte)
+            menuGestioneUtenti(utenti, ptrNumUtenti, ptrCapUtenti); // passo l'indirizzo di utenti (& aggiunte)
             break;
         case 'C':
-            menuGestionePrestiti(&utenti, &libri, &prestiti, ptrNumUtenti, ptrNumLibri, ptrNumPrestiti, ptrCapPrestiti);
+            menuGestionePrestiti(utenti, libri, prestiti, ptrNumUtenti, ptrNumLibri, ptrNumPrestiti, ptrCapPrestiti);
             break;
         /*case 'D':
             menuGestioneStatisticheReport();
@@ -125,69 +192,6 @@ free(utenti);
 free(prestiti);
 return 0;
 }
-
-
-// prototipi delle funzioni
-void menuGestioneLibri(Libro **libri, int *ptrNumLibri, int *ptrCapLibri, int numLibri);   // numLibri è il valore del puntatore!!
-
-Libro* inserisciNuovoLibro(Libro *libri, int *ptrNumLibri, int *ptrCapLibri);
-void visualizzaTuttiILibri(Libro *libri, int numLibri);
-void cercaLibroPerISBN(Libro *libri,int numLibri);
-int formatoCorrettoISBN(char *s);
-void cercaLibriPerAutore(Libro *libri,int numLibri);
-void libriDisponibiliPerPrestito(Libro *libri,int numLibri);
-
-// Registrazione prestiti
-Prestito* registra_prestito(Libro* database_libri,Utente* database_utenti,Prestito* database_prestiti,int* prestiti_inseriti,int* capacita_attuale_prestiti,int libri_inseriti,int utenti_inseriti);
-void richiedi_libro_utente(Libro* database_libri,Utente* database_utenti,int* utenti_inseriti,int libri_inseriti,int*posizione_utente,int* posizione_libro);    
-// Richiesta libro
-int richiesta_codice_ISBN(Libro* database_libri,int libri_inseriti,char ISBN[],int* posizione_libro);
-int invalida_ISBN(char ISBN[18]);
-int invalida_data(char data[11]);
-void controlla_esistenza_libro(Libro* database_libri,int libri_inseriti,char ISBN[],int* posizione_libro);
-int menu_codice_ISBN_non_valido();
-// Richiesta utente
-void richiesta_codice_utente(Utente* database_utenti, int utenti_inseriti, int* codice, int* posizione_utente);
-void controlla_esistenza_utente(Utente* database_utenti,int utenti_inseriti,int codice,int* posizione_utente);
-int menu_codice_utente_non_valido();
-// Calcolo data di restituzione
-void calcola_30_giorni_dopo(char data[]);
-void estrapola_data_numerica(char data[],int* anno, int* mese, int* giorno);
-int calcola_data_valore(int* anno,int* mese, int* giorno);
-void costruisci_data_da_valore_data(int data_valore,int* anno, int* mese, int* giorno);
-void costruisci_stringa_da_data(char data[],int anno,int mese,int giorno);
-
-// Registrazione restituzioni
-void registra_restituzione(Prestito* database_prestiti, Libro* database_libri,int prestiti_inseriti,int libri_inseriti);
-int menu_codice_prestito_errato();
-
-// Visualizzazione dei prestiti attivi
-void visualizza_prestiti_attivi(Utente* database_utenti,Prestito* database_prestiti,Libro* database_libri,int libri_inseriti,int prestiti_inseriti,int utenti_inseriti);
-
-// Visualizzazione storico dei prestiti
-void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* database_prestiti,int utenti_inseriti,int prestiti_inseriti);
-void stampa_prestito(Prestito* database_prestiti,int indice_prestito_assoluto,int indice_prestito_nel_ciclo_specifico);
-
-// Prototipi per inseirmento utente
-Utente* inserisci_nuovo_utente(Utente* database_utenti,int* utenti_inseriti,int* capacita_utenti_attuale);
-int inserimento_dati_utenti(Utente* database_utenti,int* utenti_inseriti);
-int inserimento_codice_utente(Utente* database_utenti,int* utenti_inseriti);
-void inserimento_data_iscrizione(Utente* database_utenti,int* utenti_inseriti);
-void inserimento_email(Utente* database_utenti,int* utenti_inseriti);
-int menu_codice_utente();
-int invalida_data(char* data);
-
-// Prototipi per visualizzazione degli utenti
-void visualizza_tutti_gli_utenti(Utente* database_utenti,int utenti_inseriti);
-int stampa_ordine_alfabetico_nomi(Utente* database_utenti,int utenti_inseriti);
-int stampa_ordine_alfabetico_cognomi(Utente* database_utenti,int utenti_inseriti);
-int stampa_ordine_email(Utente* database_utenti,int utenti_inseriti);
-int stampa_ordine_codice_utente(Utente* database_utenti,int utenti_inseriti);
-int stampa_ordine_data_iscrizione(Utente* database_utenti,int utenti_inseriti);
-void stampa_dati_utenti(Utente* database_utenti, int utenti_inseriti, int* indici_ordinati);
-
-// Prototipi per ricerca utente
-void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti);
 
 
 // GESTIONE UTENTI MENU
@@ -241,8 +245,6 @@ void menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capa
     // SOLO PER TEST
     free(database_utenti);
     // SOLO PER TEST
-
-    return 0;
 }
 
 /*
