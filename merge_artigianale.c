@@ -209,12 +209,11 @@ void menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capa
             {
             case 1:
                 Utente* temp;
-                temp = inserisci_nuovo_utente(database_utenti,utenti_inseriti,capacita_utenti_attuale);
+                temp = inserisci_nuovo_utente(database_utenti,utenti_inseriti,capacita_attuale_utenti);
                 if (temp == NULL) {
                     printf("Errore di allocazione in memoria! Verrai reindirizzato al menù principale\n");
                 } else {
                     database_utenti = temp;
-                    free(temp);
                 }
                 break;
         
@@ -810,7 +809,6 @@ void menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestit
                     printf("\nErrore di allocazione in memoria! Verrai reindirizzato al menù gestione utenti\n");
                 } else {
                     database_prestiti = temp; // Se è avvenuta con successo, aggiorno tale puntatore.
-                    free(temp);
                 }
                 break;
             
@@ -1629,7 +1627,6 @@ void menuGestioneLibri(Libro **libri, int *ptrNumLibri, int *ptrCapLibri,int num
                 // menu principale
             } else {
                 *libri = temp;
-                // free(temp);     // AI mi dice di togliere questa riga, discuti con prince.
             }
             break;
         case 2: // passo l'indirizzo di memoria della struct dinamica libri
@@ -1652,5 +1649,3 @@ void menuGestioneLibri(Libro **libri, int *ptrNumLibri, int *ptrCapLibri,int num
         }
     }while(sceltaGestioneLibri != 6); 
 }
-
-    
