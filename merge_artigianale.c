@@ -99,7 +99,12 @@ void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti);
 // Prototipi menu statistiche e report:
 void menuGestioneStatisticheReport(Libro **database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti); 
 void statisticheGenerali(Libro *database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti);
-void trovaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti);
+int calcolaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti, int *out_indice_libro, int *out_conteggio);
+void visualizzaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti);
+void libriPerGenere(Libro* database_libri, int libri_inseriti);
+void top5LibriPiuPrestati(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti);
+
+
 int main(){
 // funzione menu principale:
 // dichiaro le variabili fuori dal do-while
@@ -177,10 +182,10 @@ do{
         case 'C':
             menuGestionePrestiti(utenti, libri, prestiti, ptrNumUtenti, ptrNumLibri, ptrNumPrestiti, ptrCapPrestiti);
             break;
-        /*case 'D':
-            menuGestioneStatisticheReport();
+        case 'D':
+            menuGestioneStatisticheReport(libri, utenti, prestiti, ptrNumLibri, ptrNumUtenti, ptrNumPrestiti);
             break;
-        case 'E':
+        /*case 'E':
             menuGestioneFile();
             break;*/
         case 'F':
@@ -216,11 +221,11 @@ void menuGestioneStatisticheReport(Libro *database_libri, Utente *database_utent
             break;
             
             case 2:
-            libriPerGenere(); // TODO argomenti delle funzioni!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            libriPerGenere(database_libri, libri_inseriti); 
             break;
             
             case 3:
-            top5LibriPiuPrestati();
+            top5LibriPiuPrestati();  // TODO argomenti delle funzioni!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             break;
             
             case 4:
@@ -255,47 +260,42 @@ void statisticheGenerali(Libro *database_libri, Utente *database_utenti, Prestit
     printf("Numero totale di utenti registrati: %d \n",&utenti_inseriti);
     printf("Numero totale di prestiti effettuati: %d\n",&prestiti_inseriti);
     printf("Numero di prestiti attualmente attivi: %d \n",&numPrestitiAttuali);
-    printf("Libro più prestato(con più prestiti nello storico): ")  //La logica consiste nel contare quante volte ogni ISBN appare nell'array dei prestiti.
-    trovaLibroPiuPrestato(database_libri, database_prestiti, libri_inseriti, prestiti_inseriti);
+    visualizzaLibroPiuPrestato(database_libri, database_prestiti, libri_inseriti, prestiti_inseriti);
 }
 
 
 
-// funzione trova libro piu prestato
-void trovaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti) {
-    // Se non ci sono prestiti, non c'è nulla da calcolare.
+int calcolaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti, int *out_indice_libro, int *out_conteggio) {
+    // Inizializza i valori di output a uno stato di "non trovato"
+    *out_indice_libro = -1;
+    *out_conteggio = 0;
+
     if (prestiti_inseriti == 0) {
-        printf("Nessun prestito registrato.\n");
-        return;
+        return -1; // Segnala che non ci sono prestiti da analizzare
     }
 
-    // Struttura ausiliaria per contare gli ISBN, associo il codice isbn con il conteggio per il prestito corrente
     typedef struct {
         char codice_ISBN[18];
         int conteggio;
     } ConteggioISBN;
 
-    // Alloco un array per tenere traccia dei conteggi. 
-    // Nel caso peggiore, ogni prestito è per un libro diverso, e non ce un libro top prestato
     ConteggioISBN *conteggi = (ConteggioISBN*)malloc(libri_inseriti * sizeof(ConteggioISBN));
     if (conteggi == NULL) {
-        printf("Errore di allocazione memoria per le statistiche.\n");
-        return;
+        printf("Errore di allocazione memoria.\n");
+        return -1; // Segnala errore
     }
-    int numConteggi = 0; // Tiene traccia di quanti ISBN unici abbiamo contato
+    int numConteggi = 0;
 
-    // Ciclo su tutti i prestiti per contare ogni ISBN
+    // La logica di conteggio rimane identica...
     for (int i = 0; i < prestiti_inseriti; i++) {
         int trovato = 0;
-        // Controllo se questo ISBN è già nel nostro array di conteggi
         for (int j = 0; j < numConteggi; j++) {
-            if (strcmp(database_prestiti[i].codice_ISBN_libro, conteggi[j].codice_ISBN) == 0) {  // se i due isbn sono uguali, incremento il contatore in quella posizione j
+            if (strcmp(database_prestiti[i].codice_ISBN_libro, conteggi[j].codice_ISBN) == 0) {
                 conteggi[j].conteggio++;
                 trovato = 1;
                 break;
             }
         }
-        // Se non l'ho trovato, lo aggiungo come nuovo elemento, nella posizione numCOnteggi
         if (!trovato) {
             strcpy(conteggi[numConteggi].codice_ISBN, database_prestiti[i].codice_ISBN_libro);
             conteggi[numConteggi].conteggio = 1;
@@ -303,11 +303,9 @@ void trovaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, i
         }
     }
 
-    // Ora cerco il conteggio massimo
     if (numConteggi == 0) {
-        printf("Nessun libro trovato tra i prestiti.\n");
         free(conteggi);
-        return;
+        return -1; // Nessun libro trovato tra i prestiti
     }
 
     int maxConteggio = 0;
@@ -320,32 +318,112 @@ void trovaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, i
         }
     }
 
-    // Trovato l'ISBN, cerco il titolo del libro corrispondente
-    char titoloLibroPiuPrestato[101];
+    int indiceTrovato = -1;
     for (int i = 0; i < libri_inseriti; i++) {
         if (strcmp(isbnPiuPrestato, database_libri[i].codice_ISBN) == 0) {
-            strcpy(titoloLibroPiuPrestato, database_libri[i].titolo);
+            indiceTrovato = i;
             break;
         }
     }
 
-    printf("'%s' (prestato %d volte)\n", titoloLibroPiuPrestato, maxConteggio);
-
-    // Libero la memoria allocata
     free(conteggi);
+
+    // CAMBIAMENTO CHIAVE: Scrivi i risultati usando i puntatori
+    // Usa l'operatore '*' (dereferenziazione) per accedere alla variabile del chiamante
+    if (indiceTrovato != -1) {
+        *out_indice_libro = indiceTrovato;
+        *out_conteggio = maxConteggio;
+        return 0; // Successo!
+    }
+
+    return -1; // Errore: libro non trovato nel database principale
 }
 
-// funzione che visualizza il conteggio dei libri suddiviso per genere
-void libriPerGenere(Libro* database_libri, int libri_inseriti){
-    for(int i = 0; i < libri_inseriti; i++){
-        for(int j = i; j < libri_inseriti; j++){
-            if(strcmp(database_libri[i].genere,database_libri[j].genere) != 0){
-                printf("Genere: %s", ) // numero di libri (codici isbn) con stesso genere
-            }
-        }
+
+
+ // funzione per stampare il libro più prestato
+void visualizzaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti) {
+    // 1. Dichiara le variabili che conterranno i risultati
+    int indice_risultato;
+    int conteggio_risultato;
+
+    // 2. Chiama la funzione passando gli INDIRIZZI delle variabili con l'operatore '&'
+    //    e controlla il valore di ritorno.
+    if (calcolaLibroPiuPrestato(database_libri, database_prestiti, libri_inseriti, prestiti_inseriti, &indice_risultato, &conteggio_risultato) == 0) {
+        // Se la funzione ha avuto successo (ha restituito 0)...
+        // ...usa le variabili locali che sono state popolate dalla funzione.
+        printf("'%s' (prestato %d volte)\n", database_libri[indice_risultato].titolo, conteggio_risultato);
+    } else {
+        // Se la funzione ha restituito -1...
+        printf("Nessun prestito registrato o libro trovato.\n");
     }
 }
 
+
+
+
+// funzione che visualizza il conteggio dei libri suddiviso per genere
+void libriPerGenere(Libro* database_libri, int libri_inseriti){
+    // 1. Controllo preliminare: se non ci sono libri, non c'è nulla da fare.
+    if (libri_inseriti == 0) {
+        printf("Nessun libro presente nel catalogo.\n");
+        return;
+    }
+
+    // 2. Definiamo una struttura ausiliaria per associare un genere al suo conteggio(quello che verrà stampato).
+    typedef struct {
+        char genere[31]; // La dimensione deve corrispondere a quella nella struct Libro
+        int conteggio;
+    } ConteggioGenere;
+
+    // 3. Allochiamo memoria per un array che conterrà i conteggi.
+    //    Nel caso peggiore, ogni libro ha un genere diverso.
+    ConteggioGenere *conteggi = (ConteggioGenere*)malloc(libri_inseriti * sizeof(ConteggioGenere));
+    if (conteggi == NULL) {
+        printf("Errore critico: impossibile allocare memoria per le statistiche dei generi.\n");
+        return;
+    }
+    
+    int generiUnici = 0; // Contatore per il numero di generi unici trovati finora.
+
+    // 4. Ciclo principale per scorrere tutti i libri e popolare la nostra lista di conteggi.
+    for (int i = 0; i < libri_inseriti; i++) {
+        int trovato = 0;
+        // Cerchiamo se il genere del libro corrente è già stato registrato.
+        for (int j = 0; j < generiUnici; j++) {
+            if (strcmp(database_libri[i].genere, conteggi[j].genere) == 0) {
+                // Se lo troviamo, incrementiamo il suo conteggio e usciamo dal ciclo interno.
+                conteggi[j].conteggio++;
+                trovato = 1;
+                break;
+            }
+        }
+
+        
+        if (!trovato) {     // Se, dopo aver controllato tutti i generi unici, non l'abbiamo trovato
+            // lo aggiungiamo come nuovo genere unico alla nostra lista.
+            strcpy(conteggi[generiUnici].genere, database_libri[i].genere);
+            conteggi[generiUnici].conteggio = 1; // Il primo libro di questo genere
+            generiUnici++; // Incrementiamo il numero di generi unici che stiamo tracciando.
+        }
+    }
+
+    // 5. Ora che abbiamo tutti i conteggi, stampiamo i risultati.
+    printf("\n--- CONTEGGIO LIBRI PER GENERE ---\n");
+    for (int i = 0; i < generiUnici; i++) {
+        printf("%s: %d libri\n", conteggi[i].genere, conteggi[i].conteggio);
+    }
+
+    // 6. Liberiamo la memoria che abbiamo allocato all'inizio.
+    free(conteggi);
+}
+
+// visualizza i 5 libri con il maggior numero di prestiti
+void top5LibriPiuPrestati(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti){
+    for(int i = 0; i < 5; i++){
+        visualizzaLibroPiuPrestato()
+    }
+}
 
 // GESTIONE UTENTI MENU
 void menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capacita_attuale_utenti){
