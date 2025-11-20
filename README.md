@@ -9,3 +9,5 @@ Il modo in cui è stata scritta menuGestioneLibri (Opzione 1) è corretto e robu
 Per uniformare il codice, la soluzione migliore e più sicura è applicare il modello del puntatore a puntatore (Opzione 1) a tutte le sezioni del codice (Utenti, Prestiti) che modificano dinamicamente la dimensione di un array. Sebbene l'Opzione 2 funzioni, è più soggetta a errori, poiché è facile dimenticare di riassegnare il valore di ritorno in una delle funzioni della catena di chiamate.
 
 Discussione: occcorre passare come parametro delle funzioni un puntatore a puntatore per rendere il programma piu robusto? 
+
+Riga 666: a che serve quella funzione ? ins ?
