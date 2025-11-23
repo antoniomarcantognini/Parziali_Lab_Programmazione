@@ -462,11 +462,11 @@ void top5LibriPiuPrestati(Libro *database_libri, Prestito *database_prestiti, in
         libri_stampati++;
 
         //  "Rimuovo" i prestiti di questo libro dalla copia per non trovarlo di nuovo nel prossimo ciclo for.
-        //   Otteniamo l'ISBN del libro appena trovato.
+        //   Ottengo l'ISBN del libro appena trovato.
         char isbn_da_rimuovere[18];
         strcpy(isbn_da_rimuovere, database_libri[indice_libro_trovato].codice_ISBN);
 
-        // Scansioniamo la copia dei prestiti...
+        // Scansiono la copia dei prestiti
         for (int j = 0; j < prestiti_inseriti; j++) { // se troviamo un prestito con quell'ISBN
             
             if (strcmp(prestiti_copia[j].codice_ISBN_libro, isbn_da_rimuovere) == 0) {
@@ -1827,53 +1827,56 @@ void cercaLibriPerAutore(Libro *libri,int numLibri){
         return;
     }
 
-    int srcFlag = -1;
+    int libriTrovati; // Flag per contare i libri trovati
     char autoreInserito[51];
+    
     do{
-        // inserimento codice autore:
+        libriTrovati = 0; // Resetta il contatore ad ogni nuova ricerca
+        // inserimento nome autore:
         printf("Inserisci il nome dell'autore: \n");
         scanf(" %50[^\n]",autoreInserito);
 
         // ricerca nome autore
         for(int i = 0; i < numLibri; i++){
-            if(!strcmp(libri[i].autore,autoreInserito)){
-                srcFlag = i;
-                printf("Libro trovato! \n");
-                printf("Codice ISBN: %-17.17s\n",libri[srcFlag].codice_ISBN);
-                printf("Titolo: %-30.30s\n",libri[srcFlag].titolo);
-                printf("Autore: %-20.20s\n",libri[srcFlag].autore);
-                printf("Anno di pubblicazione: %6d\n",libri[srcFlag].anno_pubblicazione);
-                printf("Numero di copie: %6d\n", libri[srcFlag].numero_copie);
-                printf("Genere: %-15.15s\n",libri[srcFlag].genere);
+            // Confronta il nome dell'autore (TODO: ignorando maiuscole/minuscole sarebbe un miglioramento)
+            if(strcmp(libri[i].autore, autoreInserito) == 0){
+                // Se questo è il PRIMO libro trovato, stampa l'intestazione
+                if (libriTrovati == 0) {
+                    printf("\n=== Libri trovati per l'autore: %s ===\n", autoreInserito);
+                }
+                
+                // Stampa i dettagli del libro trovato
+                printf("\n");
+                printf("Titolo:              %s\n", libri[i].titolo);
+                printf("Codice ISBN:         %s\n", libri[i].codice_ISBN);
+                printf("Anno di pubblicazione: %d\n", libri[i].anno_pubblicazione);
+                printf("Numero di copie:     %d\n", libri[i].numero_copie);
+                printf("Genere:              %s\n", libri[i].genere);
+
+                libriTrovati++; // Incrementa il contatore dei libri trovati
             }
         }
-        if(srcFlag == -1){  // se l'autore non è stato trovato, è possibile inserire un altro codice oppure tornare alla gestione libri
-        int scelta;
-        printf("\n Non è stato trovato nessun libro con il nome dell'autore inserito!\n");
-        printf("Cosa vuoi fare?\n");
-        printf("\n  1. Inserire un altro nome dell'autore da cercare;\n");
-        printf("  2. Tornare al menù gestione libri.\n");
-        printf("\nLa tua scelta: ");
+        
+        // Se, dopo aver controllato tutti i libri, il contatore è ancora 0
+        if(libriTrovati == 0){
+            int scelta;
+            printf("\nNon è stato trovato nessun libro con il nome dell'autore inserito!\n");
+            printf("Cosa vuoi fare?\n");
+            printf("\n  1. Inserire un altro nome dell'autore da cercare;\n");
+            printf("  2. Tornare al menù gestione libri.\n");
+            printf("\nLa tua scelta: ");
 
-        do{ // ciclo per la scelta del autore
-            //inserimento scelta:
-            scanf("%d",&scelta);
-            switch (scelta)
-            {
-            case 1:
-                break;
-
-            case 2:
-                return;
-
-            default:
+            do{ // ciclo per la scelta dell'utente
+                scanf("%d",&scelta);
+                if (scelta == 1) break;
+                if (scelta == 2) return;
                 printf("La tua scelta deve essere 1 oppure 2! Riprova:\n");
-                printf("\nLa tua scelta: ");
-                break;
-            }
-        }while (scelta!=1 && scelta != 2);
-    }
-    }while(srcFlag == -1 );
+            } while (scelta!=1 && scelta != 2);
+            
+            if (scelta == 1) continue; // Continua con il ciclo do-while
+        }
+
+    } while(libriTrovati == 0); // Continua a chiedere un autore finché non ne trova almeno uno
 }
 
 
