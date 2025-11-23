@@ -11,3 +11,5 @@ Per uniformare il codice, la soluzione migliore e più sicura è applicare il mo
 Discussione: occcorre passare come parametro delle funzioni un puntatore a puntatore per rendere il programma piu robusto? 
 
 Riga 666: a che serve quella funzione ? ins ?
+
+TODO: funzione menu se il codice isbn del libro inserito è uguale a uno gia nel database
