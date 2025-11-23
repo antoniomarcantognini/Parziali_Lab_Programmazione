@@ -74,7 +74,7 @@ void visualizza_prestiti_attivi(Utente* database_utenti,Prestito* database_prest
 void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* database_prestiti,int utenti_inseriti,int prestiti_inseriti);
 void stampa_prestito(Prestito* database_prestiti,int indice_prestito_assoluto,int indice_prestito_nel_ciclo_specifico);
 
-// Prototipi per inseirmento utente
+// Prototipi per inserimento utente
 Utente* inserisci_nuovo_utente(Utente* database_utenti,int* utenti_inseriti,int* capacita_utenti_attuale);
 int inserimento_dati_utenti(Utente* database_utenti,int* utenti_inseriti);
 int inserimento_codice_utente(Utente* database_utenti,int* utenti_inseriti);
@@ -1401,37 +1401,38 @@ int calcola_data_valore(int* anno,int* mese, int* giorno) {
     int trentuno=0;
     int ventotto=0;
     for (int i=1; i<*mese; i++) {
-        if(i==1 || i==3 || i==5 || i==7 || i==8 || i==10 || i==12) {
+        if(i==1 || i==3 || i==5 || i==7 || i==8 || i==10) {
         trentuno++;
         } else if (i==2) {
             ventotto++;
         }
     }    
+    
     data_valore =   *anno*365                                                                                       // giorni per ogni anno passato
-                    +(*anno-1)/4-(*anno-1)/100+(*anno-1)/400                                                        // anni bisestili passati
+                    +(*anno-1)/4-(*anno-1)/100+(*anno-1)/400 + 1                                                    // anni bisestili passati (+1 per l'anno 0)
                     +(*mese-1)*30 + trentuno - (2-(((*anno%4)==0 && (*anno%100)!=0) || (*anno%400)==0))*ventotto    // giorni per mese passato
                     +*giorno;                                                                                       // giorni passati in questo mese
     return data_valore;
 }
 
-
 void costruisci_data_da_valore_data(int data_valore,int* anno, int* mese, int* giorno) {
     
     int valore_anno;
     int flag_non_bisestile;
+    int giorni_da_inizio_anno;
 
-    int anno_provvisorio = data_valore / 365;
+    int anno_provvisorio = data_valore / 365 +1;
 
     // Aggiustamento anno
     do {
-        anno_provvisorio++;
-        valore_anno = anno_provvisorio*365+(anno_provvisorio-1)/4-(anno_provvisorio-1)/100+(anno_provvisorio-1)/400;
+        anno_provvisorio--;
+        valore_anno = anno_provvisorio*365+(anno_provvisorio-1)/4-(anno_provvisorio-1)/100+(anno_provvisorio-1)/400 +1; // L'ultimo +1 è necessario per considerare anche l'anno 0
         flag_non_bisestile = ((anno_provvisorio%4)!=0 || (anno_provvisorio%100)==0) && ((anno_provvisorio%400)!=0);
-    } while (data_valore - valore_anno >= 365 + 1-  flag_non_bisestile);
+        giorni_da_inizio_anno = data_valore-valore_anno;
+    } while (giorni_da_inizio_anno <= 0);
     *anno=anno_provvisorio;
     
     // Calcolo mese e giorno
-    int giorni_da_inizio_anno = data_valore - valore_anno;
     int giorni_dei_mesi[12] = {0,31,60-flag_non_bisestile,91-flag_non_bisestile,121-flag_non_bisestile,152-flag_non_bisestile,182-flag_non_bisestile,213-flag_non_bisestile,244-flag_non_bisestile,274-flag_non_bisestile,305-flag_non_bisestile,335-flag_non_bisestile};
     for (int i=1;i<12;i++) {
         if (giorni_da_inizio_anno<=giorni_dei_mesi[i]) {
@@ -1558,8 +1559,8 @@ void visualizza_prestiti_attivi(Utente* database_utenti,Prestito* database_prest
             printf("  4. Cognome utente: %s\n",cognome);
 
             // Stampa data prestito e data restituzione
-            printf("  5. Data prestito: %s",database_prestiti[i].data_prestito);
-            printf("  6. Data di restituzione prevista: %s",database_prestiti[i].data_restituzione_prevista);
+            printf("  5. Data prestito: %s\n",database_prestiti[i].data_prestito);
+            printf("  6. Data di restituzione prevista: %s\n",database_prestiti[i].data_restituzione_prevista);
         }
     }
 }
