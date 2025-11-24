@@ -2,6 +2,10 @@
 Reopsitory con i progetti per l'esame di laboratorio di programmazione, update
 
 
+merge artigianale pronto per debug. non da problemi.
+Prossime mosse: statistiche e report + scrittura su file e lets goooo
+=======
+
 IMPORTANTE PER RICCARDO  (DOBBIAMO DISCUTERNE):
 
 Il modo in cui è stata scritta menuGestioneLibri (Opzione 1) è corretto e robusto. Il modo in cui è stata scritta menuGestioneUtenti contiene un bug perché la modifica del puntatore database_utenti è solo locale e non si propaga al main.
@@ -12,4 +16,3 @@ Discussione: occcorre passare come parametro delle funzioni un puntatore a punta
 
 Riga 666: a che serve quella funzione ? ins ?
 
-TODO: funzione menu se il codice isbn del libro inserito è uguale a uno gia nel database

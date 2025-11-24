@@ -74,7 +74,7 @@ void visualizza_prestiti_attivi(Utente* database_utenti,Prestito* database_prest
 void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* database_prestiti,int utenti_inseriti,int prestiti_inseriti);
 void stampa_prestito(Prestito* database_prestiti,int indice_prestito_assoluto,int indice_prestito_nel_ciclo_specifico);
 
-// Prototipi per inseirmento utente
+// Prototipi per inserimento utente
 Utente* inserisci_nuovo_utente(Utente* database_utenti,int* utenti_inseriti,int* capacita_utenti_attuale);
 int inserimento_dati_utenti(Utente* database_utenti,int* utenti_inseriti);
 int inserimento_codice_utente(Utente* database_utenti,int* utenti_inseriti);
@@ -96,6 +96,21 @@ void stampa_dati_utenti(Utente* database_utenti, int utenti_inseriti, int* indic
 // Prototipi per ricerca utente
 void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti);
 
+// Prototipi menu statistiche e report:
+void menuGestioneStatisticheReport(Libro *database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti); 
+void statisticheGenerali(Libro *database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti);
+int calcolaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti, int *out_indice_libro, int *out_conteggio);
+void visualizzaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti);
+void libriPerGenere(Libro* database_libri, int libri_inseriti);
+void top5LibriPiuPrestati(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti);
+
+// Prototipi menu salvataggio su file
+void menuGestioneFile(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti);
+void salvaDatabaseSuFileBinario(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti);
+// Prototipi futuri
+void caricaDatabaseDaFileBinario(); 
+void esportaCatalogoInFormatoTesto();
+void esportaReportPrestitiInFormatoTesto();
 
 int main(){
 // funzione menu principale:
@@ -111,7 +126,7 @@ int main(){
     int* ptrCapUtenti = &capacitaMaxUtenti;
     int capacitaMaxPrestiti = 5;
     int* ptrCapPrestiti = &capacitaMaxPrestiti;
-    char scelta1;
+    char scelta;
     // int sceltaGestioneLibri = 0;
         
     int numLibri = 0;  // variabile che tiene conto del numero di libri inserito(nella funzione inserisci libro viene)
@@ -156,10 +171,10 @@ do{
     printf("E. GESTIONE FILE \n");
     printf("F. ESCI \n");
 
-    scanf(" %c",&scelta1);
-    scelta1 = toupper(scelta1); // Rende la scelta non case-sensitive (A o a)
+    scanf(" %c",&scelta);
+    scelta = toupper(scelta); // Rende la scelta non case-sensitive (A o a)
 
-    switch (scelta1)
+    switch (scelta)
     {
         case 'A':
             // CHIAMATA ALLA FUNZIONE: Qui avviene il cambiamento.
@@ -169,47 +184,436 @@ do{
             menuGestioneLibri(&libri, ptrNumLibri, ptrCapLibri, *ptrNumLibri);  // passo il valore del puntatore che ho incrementato nella funzione inserisci libro, permetendo alla funzione di modificarla
             break;
          case 'B':
-            menuGestioneUtenti(utenti, ptrNumUtenti, ptrCapUtenti); // passo l'indirizzo di utenti (& aggiunte)
+            menuGestioneUtenti(utenti, ptrNumUtenti, ptrCapUtenti); // non passiamo anche qui gli indirizzi & ?
             break;
         case 'C':
             menuGestionePrestiti(utenti, libri, prestiti, ptrNumUtenti, ptrNumLibri, ptrNumPrestiti, ptrCapPrestiti);
             break;
-        /*case 'D':
-            menuGestioneStatisticheReport();
+        case 'D':
+            menuGestioneStatisticheReport(libri, utenti, prestiti, *ptrNumLibri, *ptrNumUtenti, *ptrNumPrestiti);  // qui ho aggiunto *
             break;
         case 'E':
-            menuGestioneFile();
-            break;*/
+            menuGestioneFile(libri, *ptrNumLibri, utenti, *ptrNumUtenti, prestiti, *ptrNumPrestiti);
+            break;
         case 'F':
             break;
         default: 
             printf("Errore, inserisci un carattere corretto! \n");
             break;
         }
-}while(scelta1 != 'F');
+}while(scelta != 'F');
 free(libri);
 free(utenti);
 free(prestiti);
 return 0;
 }
 
+// === MENU GESTIONE FILE === //
+void menuGestioneFile(){
+    int scelta;
+    do{
+        printf("=== MENU GESTIONE FILE ===\n");
+        printf("  1. Salva database su file binario\n");
+        printf("  2. Carica database da file binario\n");
+        printf("  3. Esporta catalogo in formato testo\n");
+        printf("  4. Esporta report prestiti in formato testo\n");
+        printf("  5. Torna al menù principale.\n")
+        printf("  6. Esci.\n");
+        printf("\nTua scelta: ");
+        scanf("%d",&scelta);
+        
+        switch(scelta)
+        {
+            case 1:
+            salvaDatabaseSuFileBinario(libri, numLibri, utenti, numUtenti, prestiti, numPrestiti);  
+            break;
+            
+            /*case 2:
+            caricaDatabaseDaFileBinario();
+            break;
+            
+            case 3:
+            esportaCatalogoInFormatoTesto();
+            break;
+            
+            case 4:
+            esportaReportPrestitiInFormatoTesto();
+            break;
 
-// GESTIONE UTENTI MENU
+            case 5:
+            break;
+
+            case 6:
+            esci();
+            break;*/
+
+            default:
+                printf("Errore nell'inserimento della scelta! Deve essere 1, 2, 3 o 4\n");
+                printf("Riprova:\n");
+                break;
+        }
+
+    }while(scelta!=5);
+}
+
+// Funzioni gestione file:
+void salvaDatabaseSuFileBinario(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti){
+    FILE *fp;
+    printf("\nAvvio salvataggio dati...\n");
+    // Salvataggio LIBRI (libri.dat)
+    fp = fopen("libri.dat","wb");
+    if (fp == NULL){
+        printf("Errore: impossibile aprire 'libri.dat' per la scrittura.\n");
+        break;
+    }else{
+        // Scrivo il numero di elementi
+        fwrite(&numLibri, sizeof(int), 1, fp);
+        
+        // Scrivo l'array completo se ci sono libri
+        if (numLibri > 0 && libri != NULL) {
+            if (fwrite(libri, sizeof(Libro), numLibri, fp) != numLibri) {
+                printf("Attenzione: Errore durante la scrittura dei dati dei libri.\n");
+            }
+        }
+        fclose(fp);
+        printf("- Libri salvati correttamente (%d elementi).\n", numLibri);
+    }
+    // Salvataggio UTENTI (utenti.dat)
+    fp = fopen("utenti.dat","wb");
+    if(fp == NULL){
+        printf("Errore: impossibile aprire 'utenti.dat' per la scrittura.\n");
+        break;
+    }else{
+        fwrite(&numUtenti, sizeof(int), 1, fp);
+        
+        if (numUtenti > 0 && utenti != NULL) {
+            if (fwrite(utenti, sizeof(Utente), numUtenti, fp) != numUtenti) {
+                printf("Attenzione: Errore durante la scrittura dei dati degli utenti.\n");
+            }
+        }
+        fclose(fp);
+        printf("- Utenti salvati correttamente (%d elementi).\n", numUtenti);
+    }
+    // Salvataggio PRESTITI (prestiti.dat)
+    fp = fopen("prestiti.dat","wb");
+    if (fp == NULL) {
+        printf("Errore critico: Impossibile aprire 'prestiti.dat' per la scrittura.\n");
+    } else {
+        fwrite(&numPrestiti, sizeof(int), 1, fp);
+        
+        if (numPrestiti > 0 && prestiti != NULL) {
+            if (fwrite(prestiti, sizeof(Prestito), numPrestiti, fp) != numPrestiti) {
+                printf("Attenzione: Errore durante la scrittura dei dati dei prestiti.\n");
+            }
+        }
+        fclose(fp);
+        printf("- Prestiti salvati correttamente (%d elementi).\n", numPrestiti);
+    }
+    
+    printf("Operazione di salvataggio conclusa.\n");
+}    
+
+
+
+// === MENU GESTIONE STATISTICHE E REPORT === //
+void menuGestioneStatisticheReport(Libro *database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti){
+    int scelta;
+    do{
+        // stampa menu gestione statistiche e report
+        printf("=== MENU GESTIONE STATISTICHE E REPORT ===\n");
+        printf("  1. Statistiche generali\n");
+        printf("  2. Libri per genere\n");
+        printf("  3. Top 5 libri più prestati\n");
+        printf("  4. Torna al menù principale.\n");
+        printf("\nTua scelta: ");
+        scanf("%d",&scelta);
+        
+        switch(scelta)
+        {
+            case 1:
+            statisticheGenerali(database_libri, database_utenti, database_prestiti, libri_inseriti, utenti_inseriti, prestiti_inseriti);  
+            break;
+            
+            case 2:
+            libriPerGenere(database_libri, libri_inseriti); 
+            break;
+            
+            case 3:
+            top5LibriPiuPrestati(database_libri, database_prestiti, libri_inseriti, prestiti_inseriti);
+            break;
+            
+            case 4:
+            break;
+
+            default:
+                printf("Errore nell'inserimento della scelta! Deve essere 1, 2, 3 o 4\n");
+                printf("Riprova:\n");
+                break;
+        }
+
+    } while(scelta!=4);
+}
+
+// === FUNZIONI GESTIONE STATISTICHE E REPORT === //
+// statistiche generali
+void statisticheGenerali(Libro *database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti){
+    int numCopieDisponibili = 0;
+    int numPrestitiAttuali = 0;
+
+    for(int i = 0; i < libri_inseriti; i++){
+        numCopieDisponibili += database_libri[i].numero_copie;
+    }
+    
+    for(int i = 0; i < prestiti_inseriti; i++){
+        if(database_prestiti[i].restituito==0){
+            numPrestitiAttuali++;
+        }
+    }
+    
+    printf("Numero totale di libri (ISBN unici) nel catalogo: %d \n",libri_inseriti);  // codice ISBN univoco per ogni libro (ma ci possono essere comunque piu copie)
+    printf("Numero totale di copie disponibili: %d \n",numCopieDisponibili);
+    printf("Numero totale di utenti registrati: %d \n",utenti_inseriti);
+    printf("Numero totale di prestiti effettuati: %d\n",prestiti_inseriti);
+    printf("Numero di prestiti attualmente attivi: %d \n",numPrestitiAttuali);
+    visualizzaLibroPiuPrestato(database_libri, database_prestiti, libri_inseriti, prestiti_inseriti);
+}
+
+// funzione calcola libro piu prestato:
+//  restituisce 0 se il libro è stato trovato, -1 altrimenti
+int calcolaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti, int *out_indice_libro, int *out_conteggio) {
+    // Inizializzo i valori di output a uno stato di "non trovato"
+    *out_indice_libro = -1;
+    *out_conteggio = 0;
+
+    if (prestiti_inseriti == 0) {
+        return -1; // Segnala che non ci sono prestiti da analizzare
+    }
+
+    // definisco struct ausiliaria per associare il codice ISBN del libro al conteggio dei prestiti effettuati
+    typedef struct {
+        char codice_ISBN[18];
+        int conteggio;
+    } ConteggioISBN;
+
+    // definisco array dinamico di puntatori alla struct ConteggioISBN, per cercare libro piu prestato
+    ConteggioISBN *conteggi = (ConteggioISBN*)malloc(libri_inseriti * sizeof(ConteggioISBN));
+    if (conteggi == NULL) {
+        printf("Errore di allocazione memoria.\n");
+        return -1; // Segnala errore
+    }
+    int numConteggi = 0;
+
+    // logica per il conteggio
+    for (int i = 0; i < prestiti_inseriti; i++) {
+        int trovato = 0;
+        for (int j = 0; j < numConteggi; j++) {
+            if (strcmp(database_prestiti[i].codice_ISBN_libro, conteggi[j].codice_ISBN) == 0) {
+                conteggi[j].conteggio++;
+                trovato = 1;
+                break;
+            }
+        }
+        // se non ho trovato il codice isbn fra la struct dei libri prestati, lo aggiungo con conteggio 1
+        if (!trovato) {
+            strcpy(conteggi[numConteggi].codice_ISBN, database_prestiti[i].codice_ISBN_libro);
+            conteggi[numConteggi].conteggio = 1;
+            numConteggi++;
+        }
+    }
+
+    if (numConteggi == 0) {
+        free(conteggi);
+        return -1; // Nessun libro trovato tra i prestiti
+    }
+
+    int maxConteggio = 0;
+    char isbnPiuPrestato[18] = "";
+
+    // cerco maxConteggio = numero massimo di prestiti di un certo libro (l'indice lo trovo sotto)
+    for (int i = 0; i < numConteggi; i++) {
+        if (conteggi[i].conteggio > maxConteggio) {
+            maxConteggio = conteggi[i].conteggio;
+            strcpy(isbnPiuPrestato, conteggi[i].codice_ISBN);
+        }
+    }
+
+    // cerco codice isbn del libro con maxCOnteggio (= numero massimo di prestiti)
+    int indiceTrovato = -1;
+    for (int i = 0; i < libri_inseriti; i++) {
+        if (strcmp(isbnPiuPrestato, database_libri[i].codice_ISBN) == 0) {
+            indiceTrovato = i;
+            break;
+        }
+    }
+
+    free(conteggi);
+
+    // scrivo le variabili con i puntatori
+    if (indiceTrovato != -1) {
+        *out_indice_libro = indiceTrovato;
+        *out_conteggio = maxConteggio;
+        return 0; // Successo!
+    }
+
+    return -1; // Errore: libro non trovato nel database principale
+}
+
+
+
+ // funzione per stampare il libro più prestato
+void visualizzaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti) {
+    // Dichiaro le variabili che conterranno i risultati(posizione del libro piu prestato, numero di prestiti effettuato)
+    int indice_risultato;
+    int conteggio_risultato;
+
+    // Chiamo la funzione passando gli indirizzi delle variabili con l'operatore '&'
+    //    e controllo il valore di ritorno.
+    if (calcolaLibroPiuPrestato(database_libri, database_prestiti, libri_inseriti, prestiti_inseriti, &indice_risultato, &conteggio_risultato) == 0) { // se la funzione ha avuto successo
+        // uso le variabili della funzione per stampare il risultato
+        printf("'%s' (prestato %d volte)\n", database_libri[indice_risultato].titolo, conteggio_risultato);
+    } else { // se la funzione non ha trovato un libro
+        printf("Nessun prestito registrato o libro trovato.\n");
+    }
+}
+
+
+// funzione che visualizza il conteggio dei libri suddiviso per genere
+void libriPerGenere(Libro* database_libri, int libri_inseriti){
+    // Controllo preliminare
+    if (libri_inseriti == 0) {
+        printf("Nessun libro presente nel catalogo.\n");
+        return;
+    }
+
+    // Definisco una struttura ausiliaria per associare un genere al suo conteggio(quello che verrà stampato).
+    typedef struct {
+        char genere[31]; // La dimensione deve corrispondere a quella nella struct Libro
+        int conteggio;
+    } ConteggioGenere;
+
+    // Alloco memoria per un array che conterrà i conteggi.
+    // Nel caso peggiore, ogni libro ha un genere diverso(quindi la dimensione è libri_inseriti * sizeof(ConteggioGenere)).
+    ConteggioGenere *conteggi = (ConteggioGenere*)malloc(libri_inseriti * sizeof(ConteggioGenere));
+    if (conteggi == NULL) {
+        printf("Errore critico: impossibile allocare memoria per le statistiche dei generi.\n");
+        return;
+    }
+    
+    int generiUnici = 0; // Contatore per il numero di generi unici trovati finora.
+
+    // Ciclo principale per scorrere tutti i libri e popolare la lista di conteggi.
+    for (int i = 0; i < libri_inseriti; i++) {
+        int trovato = 0;
+        // Cerco se il genere del libro corrente è già stato registrato.
+        for (int j = 0; j < generiUnici; j++) {
+            if (strcmp(database_libri[i].genere, conteggi[j].genere) == 0) {
+                // Se lo trovo, incremento il suo conteggio ed esco dal ciclo interno.
+                conteggi[j].conteggio++;
+                trovato = 1;
+                break;
+            }
+        }
+
+        if (!trovato) {     // Se, dopo aver controllato tutti i generi unici, non l'ho trovato
+            // lo aggiungo come unico genere nella lista
+            strcpy(conteggi[generiUnici].genere, database_libri[i].genere);
+            conteggi[generiUnici].conteggio = 1; // ha conteggio 1 perche è il primo trovato con questo genere
+            generiUnici++; // Incremento il numero di generi unici che stiamo tracciando.
+        }
+    }
+
+    // Con tutti i conteggi, stampiamo i risultati
+    printf("\n Conteggio libri per genere: \n \n");
+    for (int i = 0; i < generiUnici; i++) {
+        printf("%s: %d libri\n", conteggi[i].genere, conteggi[i].conteggio);
+    }
+
+    // Libero la memoria dinamica che avevo allocato prima
+    free(conteggi);
+}
+
+
+// funzione visualizza i 5 libri con il maggior numero di prestiti (e i loro dati)
+void top5LibriPiuPrestati(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti) {
+    // Controllo preliminare
+    if (prestiti_inseriti == 0) {
+        printf("Nessun prestito registrato.\n");
+        return;
+    }
+
+    //  Creazione di una copia temporanea dell'array dei prestiti
+    Prestito *prestiti_copia = (Prestito*)malloc(prestiti_inseriti * sizeof(Prestito));
+    if (prestiti_copia == NULL) {
+        printf("Errore critico di allocazione memoria per la copia dei prestiti.\n");
+        return;
+    }
+    // Copia i dati dall'originale alla copia (per lavorare sui prestiti)
+    memcpy(prestiti_copia, database_prestiti, prestiti_inseriti * sizeof(Prestito));
+
+    printf("\n Top 5 libri più prestati: \n \n");
+    int libri_stampati = 0;
+
+    // Ciclo per trovare i 5 libri più prestati
+    for (int i = 0; i < 5; i++) {
+        int indice_libro_trovato;
+        int conteggio_prestiti;
+
+        // Cerco il libro più prestato nella copia attuale dei dati
+        int risultato = calcolaLibroPiuPrestato(database_libri, prestiti_copia, libri_inseriti, prestiti_inseriti, &indice_libro_trovato, &conteggio_prestiti);
+
+        // Se la funzione non trova più libri prestati (risultato != 0) o il conteggio è 0,
+        // significa che ho esaurito i libri da elencare, quindi esco dal ciclo.
+        if (risultato != 0 || conteggio_prestiti == 0) {
+            break;
+        }
+
+        // Se un libro è stato trovato, stampo le sue informazioni
+        printf("\n%d. Titolo: %s (prestato %d volte)\n", i + 1, database_libri[indice_libro_trovato].titolo, conteggio_prestiti);
+        printf("   Autore: %s\n", database_libri[indice_libro_trovato].autore);
+        printf("   ISBN:   %s\n", database_libri[indice_libro_trovato].codice_ISBN);
+        printf("   Genere: %s\n", database_libri[indice_libro_trovato].genere);
+
+        libri_stampati++;
+
+        //  "Rimuovo" i prestiti di questo libro dalla copia per non trovarlo di nuovo nel prossimo ciclo for.
+        //   Ottengo l'ISBN del libro appena trovato.
+        char isbn_da_rimuovere[18];
+        strcpy(isbn_da_rimuovere, database_libri[indice_libro_trovato].codice_ISBN);
+
+        // Scansiono la copia dei prestiti
+        for (int j = 0; j < prestiti_inseriti; j++) { // se troviamo un prestito con quell'ISBN
+            
+            if (strcmp(prestiti_copia[j].codice_ISBN_libro, isbn_da_rimuovere) == 0) {
+                strcpy(prestiti_copia[j].codice_ISBN_libro, ""); // lo annullo sostituendo l'ISBN con una stringa vuota.
+            }
+        }
+    }
+
+    if (libri_stampati == 0) {
+        printf("Nessun libro è stato ancora prestato.\n");
+    }
+
+    // Libero la memoria dell'array dinamico
+    free(prestiti_copia);
+}
+
+
+// === MENU GESTIONE UTENTI ===
 void menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capacita_attuale_utenti){
     int scelta;
     do { 
         // Stampa menù gestione utenti
         printf("=== MENU GESTIONE UTENTI ===\n");
-        printf("  1. Inserisci nuovo utente;\n");
+        printf("  1. Inserisci nuovo utente\n");
         printf("  2. Visualizza tutti gli utenti;\n");
-        printf("  3. Cerca utente per codice.\n");
-        printf("  4. Torna al menù principale.\n");
+        printf("  3. Cerca utente per codice\n");
+        printf("  4. Torna al menù principale\n");
         printf("\nTua scelta: ");
         scanf("%d",&scelta);
 
         // Switch menù:
         if (*utenti_inseriti!=0 || scelta == 1 || scelta==4) {
-                switch (scelta)
+            switch (scelta)
             {
             case 1:
                 Utente* temp;
@@ -233,7 +637,7 @@ void menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capa
                 break;
 
             default:
-                printf("Errore nell'inserimento della scelta! Deve essere 1, 2 o 3\n");
+                printf("Errore nell'inserimento della scelta! Deve essere 1, 2, 3 o 4\n");
                 printf("Riprova:\n");
                 break;
             }
@@ -241,10 +645,6 @@ void menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capa
             printf("Non ci sono utenti inseriti, dunque non è possibile fare alcuna azione diversa dalla 1! Riprova:\n");
         }
     } while (scelta != 4);
-    
-    // SOLO PER TEST
-    free(database_utenti);
-    // SOLO PER TEST
 }
 
 /*
@@ -272,6 +672,7 @@ Utente* inserisci_nuovo_utente(Utente *database_utenti, int *utenti_inseriti, in
     return database_utenti;
 }
 
+// funzione inserimento dati utente
 int inserimento_dati_utenti(Utente* database_utenti,int* utenti_inseriti) {    
 
     // Inserimento codice utente
@@ -357,6 +758,7 @@ int inserimento_codice_utente(Utente* database_utenti, int* utenti_inseriti) {
     return 0;
 }
 
+// funzione inserimento data di iscrizione
 void inserimento_data_iscrizione(Utente* database_utenti, int* utenti_inseriti) {
     char data[11];
     
@@ -408,6 +810,7 @@ void inserimento_email(Utente* database_utenti,int* utenti_inseriti) {
     // Copia nel database
     strcpy(database_utenti[*(utenti_inseriti)].email,email);
 }
+
 
 /*
   == VISUALIZZAZIONE UTENTI ==
@@ -463,6 +866,7 @@ void visualizza_tutti_gli_utenti(Utente* database_utenti,int utenti_inseriti) {
     } while (scelta != 6);
 }
 
+
 int stampa_ordine_alfabetico_nomi(Utente* database_utenti,int utenti_inseriti) {
     
     // Inizializzazione vettore degli indici
@@ -504,6 +908,7 @@ int stampa_ordine_alfabetico_nomi(Utente* database_utenti,int utenti_inseriti) {
     // Stampa utenti
     stampa_dati_utenti(database_utenti,utenti_inseriti,indici_ordinati);
 
+    // libero vettori indici dinamici
     free(indici_ordinati);
     free(nomi_cognomi);
     return 0;
@@ -612,6 +1017,7 @@ int stampa_ordine_codice_utente(Utente* database_utenti,int utenti_inseriti) {
     // Stampa dati utenti
     stampa_dati_utenti(database_utenti,utenti_inseriti,indici_ordinati);
 
+    // libero vettori indici dinamici
     free(indici_ordinati);
     return 0;
 }
@@ -788,6 +1194,8 @@ void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti) {
     } while (src_flag == -1);
 
 }
+
+// === MENU GESTIONE PRESTITI === //
 void menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestito* database_prestiti,int* utenti_inseriti, int* libri_inseriti,int* prestiti_inseriti,int* capacita_attuale_prestiti){
     int scelta;
     do {        
@@ -840,13 +1248,13 @@ void menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestit
     return;
 }
 
-
+// Funzione registra prestito
 Prestito* registra_prestito(Libro* database_libri,Utente* database_utenti,Prestito* database_prestiti,int* prestiti_inseriti,int* capacita_attuale_prestiti,int libri_inseriti,int utenti_inseriti) {
 
     // Richiesta libro e utente + controllo
     int flag_inserimento;
-    int posizione_libro;
-    int posizione_utente;
+    int posizione_libro=-1;
+    int posizione_utente=-1;
     richiedi_libro_utente(database_libri,database_utenti,&utenti_inseriti,libri_inseriti,&posizione_utente,&posizione_libro);
     if (posizione_utente == -1 || posizione_libro == -1) {     // Se una delle due posizioni risulta ancora -1, allora c'è stato un errore nella richiesta del libro oppure  
                                                                 // una richiesta di uscita dall'inserimento prestiti (tutti sono opportunamente segnalati nelle varie funzioni)
@@ -859,7 +1267,7 @@ Prestito* registra_prestito(Libro* database_libri,Utente* database_utenti,Presti
         if (database_prestiti == NULL) {
             return NULL;
         }
-        *capacita_attuale_prestiti = *capacita_attuale_prestiti*2;
+        *capacita_attuale_prestiti = 2 * *capacita_attuale_prestiti;
     }
     
     // Inserimento codice ISBN e codice utente
@@ -872,7 +1280,7 @@ Prestito* registra_prestito(Libro* database_libri,Utente* database_utenti,Presti
     // Inserimento data_prestito
     char data[11];
     do {
-        printf("\nInserisici la data del prestito: ");
+        printf("\nInserisci la data del prestito: ");
         scanf("%10s",data);
         if (invalida_data(data)) {
             printf("Formato non valido! Formato corretto: gg/mm/aaaa. Riprova: \n");
@@ -912,6 +1320,7 @@ void richiedi_libro_utente(Libro* database_libri,Utente* database_utenti,int* ut
     return;
 }
 
+
 int invalida_ISBN(char ISBN[18]) {  // ritorna 1 se non è valido, 0 altrimenti
     if (strlen(ISBN)!=17) {
         return 1;
@@ -933,6 +1342,7 @@ int invalida_ISBN(char ISBN[18]) {  // ritorna 1 se non è valido, 0 altrimenti
             ISBN[10] != '-' || ISBN[15] != '-';
 }
 
+
 int invalida_data(char data[11]) {
     if (strlen(data)!=10) {
         return 1;
@@ -947,6 +1357,7 @@ int invalida_data(char data[11]) {
             data[9] < '0' || data[9] > '9' ||
             data[2] != '/' || data[5] != '/';
 }
+
 
 int menu_codice_ISBN_non_valido() {
     int scelta=0;
@@ -970,6 +1381,7 @@ int menu_codice_ISBN_non_valido() {
     } while(scelta != 1 && scelta != 2);
 }
 
+
 void controlla_esistenza_libro(Libro* database_libri,int libri_inseriti,char ISBN[],int* posizione_libro) {
     for (int i=0;i<libri_inseriti;i++) {
         if (strcmp(ISBN,database_libri[i].codice_ISBN)==0) {
@@ -982,6 +1394,7 @@ void controlla_esistenza_libro(Libro* database_libri,int libri_inseriti,char ISB
     *posizione_libro=-1;
     return;
 }
+
 
 int richiesta_codice_ISBN(Libro* database_libri,int libri_inseriti,char ISBN[],int* posizione_libro) {
     do {
@@ -1009,7 +1422,7 @@ int richiesta_codice_ISBN(Libro* database_libri,int libri_inseriti,char ISBN[],i
                 return -1;
             }
         }
-
+    
     } while (invalida_ISBN(ISBN) || *posizione_libro == -1);
     return 0;
 }
@@ -1039,6 +1452,7 @@ void richiesta_codice_utente(Utente* database_utenti, int utenti_inseriti, int* 
     } while (*posizione_utente == -1 || *codice <= 0);
 }
 
+
 void controlla_esistenza_utente(Utente* database_utenti,int utenti_inseriti,int codice,int* posizione_utente) {
     for (int i=0;i<utenti_inseriti;i++) {
         if (codice == database_utenti[i].codice_utente) {
@@ -1050,6 +1464,7 @@ void controlla_esistenza_utente(Utente* database_utenti,int utenti_inseriti,int 
     printf("Non è stato trovato alcun utente con tale codice!");
     *posizione_utente=-1;
 }
+
 
 int menu_codice_utente_non_valido() {
     int scelta=0;
@@ -1074,6 +1489,7 @@ int menu_codice_utente_non_valido() {
     } while(scelta != 1 && scelta != 2);
 }
 
+
 void calcola_30_giorni_dopo(char data[]) {
     int anno;
     int mese;
@@ -1086,25 +1502,28 @@ void calcola_30_giorni_dopo(char data[]) {
     costruisci_stringa_da_data(data,anno,mese,giorno);
 }
 
+
 void estrapola_data_numerica(char data[],int* anno, int* mese, int* giorno) {
     *anno = (data[9]-'0') + 10*(data[8]-'0') + 100*(data[7]-'0') + 1000*(data[6]-'0');
     *mese = (data[4]-'0') + 10*(data[3]-'0');
     *giorno = (data[1]-'0') + 10*(data[0]-'0');
 }
 
+
 int calcola_data_valore(int* anno,int* mese, int* giorno) {
     int data_valore;
     int trentuno=0;
     int ventotto=0;
     for (int i=1; i<*mese; i++) {
-        if(i==1 || i==3 || i==5 || i==7 || i==8 || i==10 || i==12) {
+        if(i==1 || i==3 || i==5 || i==7 || i==8 || i==10) {
         trentuno++;
         } else if (i==2) {
             ventotto++;
         }
     }    
+    
     data_valore =   *anno*365                                                                                       // giorni per ogni anno passato
-                    +(*anno-1)/4-(*anno-1)/100+(*anno-1)/400                                                        // anni bisestili passati
+                    +(*anno-1)/4-(*anno-1)/100+(*anno-1)/400 + 1                                                    // anni bisestili passati (+1 per l'anno 0)
                     +(*mese-1)*30 + trentuno - (2-(((*anno%4)==0 && (*anno%100)!=0) || (*anno%400)==0))*ventotto    // giorni per mese passato
                     +*giorno;                                                                                       // giorni passati in questo mese
     return data_valore;
@@ -1114,19 +1533,20 @@ void costruisci_data_da_valore_data(int data_valore,int* anno, int* mese, int* g
     
     int valore_anno;
     int flag_non_bisestile;
+    int giorni_da_inizio_anno;
 
-    int anno_provvisorio = data_valore / 365;
+    int anno_provvisorio = data_valore / 365 +1;
 
     // Aggiustamento anno
     do {
-        anno_provvisorio++;
-        valore_anno = anno_provvisorio*365+(anno_provvisorio-1)/4-(anno_provvisorio-1)/100+(anno_provvisorio-1)/400;
+        anno_provvisorio--;
+        valore_anno = anno_provvisorio*365+(anno_provvisorio-1)/4-(anno_provvisorio-1)/100+(anno_provvisorio-1)/400 +1; // L'ultimo +1 è necessario per considerare anche l'anno 0
         flag_non_bisestile = ((anno_provvisorio%4)!=0 || (anno_provvisorio%100)==0) && ((anno_provvisorio%400)!=0);
-    } while (data_valore - valore_anno >= 365 + 1-  flag_non_bisestile);
+        giorni_da_inizio_anno = data_valore-valore_anno;
+    } while (giorni_da_inizio_anno <= 0);
     *anno=anno_provvisorio;
     
     // Calcolo mese e giorno
-    int giorni_da_inizio_anno = data_valore - valore_anno;
     int giorni_dei_mesi[12] = {0,31,60-flag_non_bisestile,91-flag_non_bisestile,121-flag_non_bisestile,152-flag_non_bisestile,182-flag_non_bisestile,213-flag_non_bisestile,244-flag_non_bisestile,274-flag_non_bisestile,305-flag_non_bisestile,335-flag_non_bisestile};
     for (int i=1;i<12;i++) {
         if (giorni_da_inizio_anno<=giorni_dei_mesi[i]) {
@@ -1138,6 +1558,7 @@ void costruisci_data_da_valore_data(int data_valore,int* anno, int* mese, int* g
     *mese = 12;
     *giorno = giorni_da_inizio_anno-giorni_dei_mesi[11];
 }
+
 
 void costruisci_stringa_da_data(char data[],int anno,int mese,int giorno) {
     data[0] = giorno / 10 +'0';
@@ -1153,6 +1574,7 @@ void costruisci_stringa_da_data(char data[],int anno,int mese,int giorno) {
     data[10] = '\0';
 }
 
+// funzione registra restituzione
 void registra_restituzione(Prestito* database_prestiti,Libro* database_libri, int prestiti_inseriti, int libri_inseriti) {
     
     // Richiedi prestito
@@ -1192,6 +1614,7 @@ void registra_restituzione(Prestito* database_prestiti,Libro* database_libri, in
     return;
 }
 
+
 int menu_codice_prestito_errato() {
     
     int scelta;
@@ -1218,6 +1641,7 @@ int menu_codice_prestito_errato() {
 
 }
 
+// funzione visualizza prestiti attivi
 void visualizza_prestiti_attivi(Utente* database_utenti,Prestito* database_prestiti,Libro* database_libri,int libri_inseriti,int prestiti_inseriti,int utenti_inseriti) {
     printf("\nEcco tutti i prestiti attivi al momento:\n");
     for (int i=0;i<prestiti_inseriti;i++) { // Ciclo sui prestiti inseriti
@@ -1249,12 +1673,13 @@ void visualizza_prestiti_attivi(Utente* database_utenti,Prestito* database_prest
             printf("  4. Cognome utente: %s\n",cognome);
 
             // Stampa data prestito e data restituzione
-            printf("  5. Data prestito: %s",database_prestiti[i].data_prestito);
-            printf("  6. Data di restituzione prevista: %s",database_prestiti[i].data_restituzione_prevista);
+            printf("  5. Data prestito: %s\n",database_prestiti[i].data_prestito);
+            printf("  6. Data di restituzione prevista: %s\n",database_prestiti[i].data_restituzione_prevista);
         }
     }
 }
 
+// funzione visualizza storico prestiti utente
 void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* database_prestiti,int utenti_inseriti,int prestiti_inseriti) {
     
     int codice;
@@ -1327,7 +1752,7 @@ void stampa_prestito(Prestito* database_prestiti,int indice_prestito_assoluto,in
 } 
 
 
-// Funzione inserisciNuovoLibro     libri,*ptrNumLibri, *ptrCapLibri
+// Funzione inserisciNuovoLibro
 Libro* inserisciNuovoLibro(Libro *libri,int *ptrNumLibri,int* ptrCapLibri){
     
     // riallocamento se necessario
@@ -1355,7 +1780,6 @@ Libro* inserisciNuovoLibro(Libro *libri,int *ptrNumLibri,int* ptrCapLibri){
     }
 
     // controllo eventuali duplicati (il codice ISBN è univoco)
-    //int duplicato = 0;
     for (int i = 0; i < *ptrNumLibri; i++) {
         if (!strcmp(libri[i].codice_ISBN, libri[*ptrNumLibri].codice_ISBN)) {
             printf("ISBN già presente nella libreria. Riprova.\n");
@@ -1406,37 +1830,44 @@ Libro* inserisciNuovoLibro(Libro *libri,int *ptrNumLibri,int* ptrCapLibri){
 
     // Input genere
     printf("Inserisci genere (max 30 caratteri): ");
-    scanf(" %30[^\n]", libri[*ptrNumLibri].genere);   // Nota lo spazio iniziale!
+    scanf(" %30[^\n]", libri[*ptrNumLibri].genere);
     
-    // Incrementa il contatore al prossimo libro nell'array libri
+    // Incremento il contatore al prossimo libro nell'array libri
     (*ptrNumLibri)++;
 
     printf("Libro inserito con successo!\n");
     return libri;
 }
 
-// funzione visualizzaTuttiILibri: libri, *ptrNumLibri
+
+// funzione visualizzaTuttiILibri:
 void visualizzaTuttiILibri(Libro *libri, int numLibri){
-    /*if (numLibri <= 0) {
+    if (numLibri <= 0) {
         printf("Nessun libro presente.\n");
         return;
-    }*/
-     // intestazione tabella
-    printf("\n%-17s | %-30s | %-20s | %-6s | %-6s | %-15s\n", "ISBN", "Titolo", "Autore", "Anno", "Copie", "Genere");  // controlla formati
-    printf("\n\n");
-
-    // Riga per ogni libro (uso precisione per troncare senza overflow) // todo: da tabella a lista (+leggibile)
-    for (int i = 0; i < numLibri; ++i) {
-        printf("%-17.17s | %-30.30s | %-20.20s | %6d | %6d | %-15.15s\n",
-               libri[i].codice_ISBN,
-               libri[i].titolo,
-               libri[i].autore,
-               libri[i].anno_pubblicazione,
-               libri[i].numero_copie,
-               libri[i].genere);
     }
+    
+    printf("\n=== ELENCO COMPLETO DEI LIBRI NEL CATALOGO ===\n\n");
+
+    // Scorre l'intero array di libri
+    for (int i = 0; i < numLibri; ++i) {
+        // Stampa le informazioni del libro corrente in formato verticale
+        // L'uso di "%-25s" allinea le etichette per una migliore leggibilità
+        printf("%-25s: %s\n", "ISBN", libri[i].codice_ISBN);
+        printf("%-25s: %s\n", "Titolo", libri[i].titolo);
+        printf("%-25s: %s\n", "Autore", libri[i].autore);
+        printf("%-25s: %d\n", "Anno di Pubblicazione", libri[i].anno_pubblicazione);
+        printf("%-25s: %d\n", "Numero di Copie", libri[i].numero_copie);
+        printf("%-25s: %s\n", "Genere", libri[i].genere);
+
+        if (i < numLibri - 1) {
+            printf("\n\n");
+        }
+    }
+    
     printf("\n");
 }
+
 
 // funzione cerca libro per ISBN-> ritorna o l'indice o -1 attraverso una stampa libri,numLibri
 void cercaLibroPerISBN(Libro *libri,int numLibri){
@@ -1502,6 +1933,7 @@ void cercaLibroPerISBN(Libro *libri,int numLibri){
     }while(srcFlag == -1 || invalida_ISBN(isbnInserito));
 }
 
+
 // funzione cerca libri per autore  libri,numLibri
 void cercaLibriPerAutore(Libro *libri,int numLibri){
     if (libri == NULL || numLibri <= 0) {
@@ -1509,54 +1941,58 @@ void cercaLibriPerAutore(Libro *libri,int numLibri){
         return;
     }
 
-    int srcFlag = -1;
+    int libriTrovati; // Flag per contare i libri trovati
     char autoreInserito[51];
+    
     do{
-        // inserimento codice autore:
+        libriTrovati = 0; // Resetta il contatore ad ogni nuova ricerca
+        // inserimento nome autore:
         printf("Inserisci il nome dell'autore: \n");
         scanf(" %50[^\n]",autoreInserito);
 
         // ricerca nome autore
         for(int i = 0; i < numLibri; i++){
-            if(!strcmp(libri[i].autore,autoreInserito)){
-                srcFlag = i;
-                printf("Libro trovato! \n");
-                printf("Codice ISBN: %-17.17s\n",libri[srcFlag].codice_ISBN);
-                printf("Titolo: %-30.30s\n",libri[srcFlag].titolo);
-                printf("Autore: %-20.20s\n",libri[srcFlag].autore);
-                printf("Anno di pubblicazione: %6d\n",libri[srcFlag].anno_pubblicazione);
-                printf("Numero di copie: %6d\n", libri[srcFlag].numero_copie);
-                printf("Genere: %-15.15s\n",libri[srcFlag].genere);
+            // Confronta il nome dell'autore (TODO: ignorando maiuscole/minuscole sarebbe un miglioramento)
+            if(strcmp(libri[i].autore, autoreInserito) == 0){
+                // Se questo è il PRIMO libro trovato, stampa l'intestazione
+                if (libriTrovati == 0) {
+                    printf("\n=== Libri trovati per l'autore: %s ===\n", autoreInserito);
+                }
+                
+                // Stampa i dettagli del libro trovato
+                printf("\n");
+                printf("Titolo:              %s\n", libri[i].titolo);
+                printf("Codice ISBN:         %s\n", libri[i].codice_ISBN);
+                printf("Anno di pubblicazione: %d\n", libri[i].anno_pubblicazione);
+                printf("Numero di copie:     %d\n", libri[i].numero_copie);
+                printf("Genere:              %s\n", libri[i].genere);
+
+                libriTrovati++; // Incrementa il contatore dei libri trovati
             }
         }
-        if(srcFlag == -1){  // se l'autore non è stato trovato, è possibile inserire un altro codice oppure tornare alla gestione libri
-        int scelta;
-        printf("\n Non è stato trovato nessun libro con il nome dell'autore inserito!\n");
-        printf("Cosa vuoi fare?\n");
-        printf("\n  1. Inserire un altro nome dell'autore da cercare;\n");
-        printf("  2. Tornare al menù gestione libri.\n");
-        printf("\nLa tua scelta: ");
+        
+        // Se, dopo aver controllato tutti i libri, il contatore è ancora 0
+        if(libriTrovati == 0){
+            int scelta;
+            printf("\nNon è stato trovato nessun libro con il nome dell'autore inserito!\n");
+            printf("Cosa vuoi fare?\n");
+            printf("\n  1. Inserire un altro nome dell'autore da cercare;\n");
+            printf("  2. Tornare al menù gestione libri.\n");
+            printf("\nLa tua scelta: ");
 
-        do{ // ciclo per la scelta del autore
-            //inserimento scelta:
-            scanf("%d",&scelta);
-            switch (scelta)
-            {
-            case 1:
-                break;
-
-            case 2:
-                return;
-
-            default:
+            do{ // ciclo per la scelta dell'utente
+                scanf("%d",&scelta);
+                if (scelta == 1) break;
+                if (scelta == 2) return;
                 printf("La tua scelta deve essere 1 oppure 2! Riprova:\n");
-                printf("\nLa tua scelta: ");
-                break;
-            }
-        }while (scelta!=1 && scelta != 2);
-    }
-    }while(srcFlag == -1 );
+            } while (scelta!=1 && scelta != 2);
+            
+            if (scelta == 1) continue; // Continua con il ciclo do-while
+        }
+
+    } while(libriTrovati == 0); // Continua a chiedere un autore finché non ne trova almeno uno
 }
+
 
 // funzione libri disponibili per il prestito,visualizza solo libri con numero copie >0 e li ordina per il titolo: ordine alfabetico crescente
 void libriDisponibiliPerPrestito(Libro *libri,int numLibri){
@@ -1585,25 +2021,42 @@ void libriDisponibiliPerPrestito(Libro *libri,int numLibri){
         }
     }
 
-    // stampo solo libri con copie > 0
-    printf("\n%-17s | %-30s | %-20s | %-6s | %-6s | %-15s\n\n",
-           "ISBN", "Titolo", "Autore", "Anno", "Copie", "Genere");
+    printf("\n=== LIBRI DISPONIBILI PER IL PRESTITO (Ordinati per Titolo) ===\n\n");
+    
+    int libriDisponibili = 0; // Contatore per i libri che rispettano il vincolo
 
+    // Scorro i libri (ormai ordinati) per stamparli
     for (int i = 0; i < numLibri; i++) {
+        // Applico il vincolo: stampo solo se le copie sono > 0
         if (libri[i].numero_copie > 0) {
-            printf("%-17s | %-30.30s | %-20.20s | %6d | %6d | %-15.15s\n",
-                   libri[i].codice_ISBN,
-                   libri[i].titolo,
-                   libri[i].autore,
-                   libri[i].anno_pubblicazione,
-                   libri[i].numero_copie,
-                   libri[i].genere);
+            
+            // Se questo non è il primo libro che stampo, aggiungiamo il doppio spazio
+            if (libriDisponibili > 0) {
+                printf("\n\n");
+            }
+
+            // Stampa le informazioni in formato verticale
+            printf("%-25s: %s\n", "Titolo", libri[i].titolo);
+            printf("%-25s: %s\n", "Autore", libri[i].autore);
+            printf("%-25s: %s\n", "ISBN", libri[i].codice_ISBN);
+            printf("%-25s: %d\n", "Copie Disponibili", libri[i].numero_copie);
+            printf("%-25s: %s\n", "Genere", libri[i].genere);
+
+            libriDisponibili++; // Incrementa il contatore dei libri validi
         }
     }
+    
+    //  Se dopo aver ciclato tutti i libri il contatore è ancora a 0,
+    //    significa che nessun libro era disponibile.
+    if (libriDisponibili == 0) {
+        printf("Attualmente non ci sono libri disponibili per il prestito.\n");
+    }
+
+    printf("\n");
 }
 
 
-// menu A: GESTIONE LIBRI         libri, *ptrNumLibri, *ptrCapLibri, numLibri
+// === MENU GESTIONE LIBRO === //
 void menuGestioneLibri(Libro **libri, int *ptrNumLibri, int *ptrCapLibri,int numLibri){
     int sceltaGestioneLibri = 0;
     do{
