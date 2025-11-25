@@ -110,7 +110,8 @@ void salvaDatabaseSuFileBinario(Libro *libri, int numLibri, Utente *utenti, int 
 // Prototipi futuri
 void caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Utente **utenti, int *numUtenti, int *capUtenti, Prestito **prestiti, int *numPrestiti, int *capPrestiti);  // cap... è la capacità attuale
 void esportaCatalogoInFormatoTesto(Libro *libri, int numLibri);
-void esportaReportPrestitiInFormatoTesto();
+void esportaReportPrestitiInFormatoTesto(Prestito *prestiti, int numPrestiti, Libro *libri, int numLibri, Utente *utenti, int numUtenti);
+void esci(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti);
 
 int main(){
 // funzione menu principale:
@@ -229,23 +230,23 @@ void menuGestioneFile(Libro **libri, int *numLibri, int *capLibri, Utente **uten
             break;
             
             case 2:                   // passiamo il doppio puntatore
-            caricaDatabaseDaFileBinario(libri, numLibri, ptrCapLibri, utenti, numUtenti, ptrCapUtenti, prestiti, numPrestiti, ptrCapPrestiti);
+            caricaDatabaseDaFileBinario(libri, numLibri, capLibri, utenti, numUtenti, capUtenti, prestiti, numPrestiti, capPrestiti);
             break;
             
             case 3:
             esportaCatalogoInFormatoTesto(*libri, *numLibri);
             break;
             
-            /*case 4:
-            esportaReportPrestitiInFormatoTesto();
+            case 4:
+            esportaReportPrestitiInFormatoTesto(*prestiti, *numPrestiti, *libri, *numLibri, *utenti, *numUtenti);
             break;
 
             case 5:
             break;
 
             case 6:
-            esci();
-            break;*/
+            esci(*libri, *numLibri, *utenti, *numUtenti, *prestiti, *numPrestiti);
+            break;
 
             default:
                 printf("Errore nell'inserimento della scelta! Deve essere 1, 2, 3 o 4\n");
@@ -451,6 +452,105 @@ void esportaCatalogoInFormatoTesto(Libro *libri, int numLibri) {
     printf("\nCatalogo esportato con successo in 'catalogo.txt'!\n");
 }
 
+// funzione esporta report prestiti in formato testo
+void esportaReportPrestitiInFormatoTesto(Prestito *prestiti, int numPrestiti, Libro *libri, int numLibri, Utente *utenti, int numUtenti) {
+    if (numPrestiti == 0 || prestiti == NULL) {
+        printf("Nessun prestito da esportare.\n");
+        return;
+    }
+
+    FILE *fp = fopen("report_prestiti.txt", "w");
+    if (fp == NULL) {
+        printf("Errore: Impossibile creare il file 'report_prestiti.txt'.\n");
+        return;
+    }
+
+    fprintf(fp, "=== REPORT PRESTITI ATTIVI ===\n");
+    int prestitiAttiviTrovati = 0;
+
+    for (int i = 0; i < numPrestiti; i++) {
+        // Filtriamo solo i prestiti NON restituiti (restituito == 0)
+        if (prestiti[i].restituito == 0) {
+            prestitiAttiviTrovati++;
+
+            // 1. Cerchiamo il Titolo del libro usando l'ISBN
+            char titoloLibro[101] = "Titolo non trovato";
+            for (int j = 0; j < numLibri; j++) {
+                if (strcmp(prestiti[i].codice_ISBN_libro, libri[j].codice_ISBN) == 0) {
+                    strcpy(titoloLibro, libri[j].titolo);
+                    break;
+                }
+            }
+
+            // 2. Cerchiamo Nome e Cognome utente usando il codice utente
+            char nomeUtente[105] = "Utente sconosciuto"; // Abbastanza grande per nome + spazio + cognome
+            for (int k = 0; k < numUtenti; k++) {
+                if (prestiti[i].codice_utente == utenti[k].codice_utente) {
+                    sprintf(nomeUtente, "%s %s", utenti[k].nome, utenti[k].cognome);
+                    break;
+                }
+            }
+
+            // 3. Scriviamo la riga nel file
+            fprintf(fp, "ID Prestito: %d | ISBN: %s | Titolo: %s | ID Utente: %d | Nome: %s | Data Prestito: %s | Restituzione Prevista: %s\n",
+                    prestiti[i].codice_prestito,
+                    prestiti[i].codice_ISBN_libro,
+                    titoloLibro,
+                    prestiti[i].codice_utente,
+                    nomeUtente,
+                    prestiti[i].data_prestito,
+                    prestiti[i].data_restituzione_prevista);
+        }
+    }
+
+    if (prestitiAttiviTrovati == 0) {
+        fprintf(fp, "Nessun prestito attivo al momento.\n");
+    }
+
+    fclose(fp);
+    printf("\nReport esportato con successo in 'report_prestiti.txt' (%d prestiti attivi).\n", prestitiAttiviTrovati);
+}
+
+// Funzione esci
+void esci(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti) {
+    char risposta;
+    
+    printf("\n=== CHIUSURA PROGRAMMA ===\n");
+    printf("Vuoi salvare le modifiche su file binario prima di uscire? (S/N): ");
+    scanf(" %c", &risposta);
+    risposta = toupper(risposta);
+
+    if (risposta == 'S') {
+        salvaDatabaseSuFileBinario(libri, numLibri, utenti, numUtenti, prestiti, numPrestiti);
+    } else {
+        printf("Chiusura senza salvataggio...\n");
+    }
+
+    printf("Liberazione della memoria in corso...\n");
+    
+    // Controllo e liberazione memoria Libri
+    if (libri != NULL) {
+        free(libri);
+        libri = NULL;
+    }
+    
+    // Controllo e liberazione memoria Utenti
+    if (utenti != NULL) {
+        free(utenti);
+        utenti = NULL;
+    }
+
+    // Controllo e liberazione memoria Prestiti
+    if (prestiti != NULL) {
+        free(prestiti);
+        prestiti = NULL;
+    }
+
+    printf("Memoria liberata correttamente.\n");
+    printf("Arrivederci!\n");
+    
+    exit(0); // Termina immediatamente l'esecuzione del programma
+}
 
 // === MENU GESTIONE STATISTICHE E REPORT === //
 void menuGestioneStatisticheReport(Libro *database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti){
