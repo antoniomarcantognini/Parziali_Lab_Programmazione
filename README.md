@@ -29,3 +29,18 @@ RICORDARSI: Inserire menu uscita da inserimento libri (ANTO)
             TOP 5 LIBRI con vettore di indici (ANTO)
             Se Libri/Utenti/Prestiti == NULL Nella lettura del database, bisogna uscire da tutto il programma (e fare i vari free) (RICK)
             TEST da riscrivere (ANTO)
+
+
+controlli chiesti dal professore:
+1. Inserimento libro con ISBN valido
+2. Inserimento libro con ISBN duplicato (deve fallire)
+3. Ricerca libro esistente
+4. Ricerca libro non esistente
+5. Creazione prestito con libro disponibile
+6. Creazione prestito con libro non disponibile (deve fallire)
+7. Restituzione libro
+8. Salvataggio e caricamento da file binario
+9. Esportazione catalogo in formato testo
+10. Statistiche con database vuoto
+11. Statistiche con database popolato
+12. Gestione array pieno
