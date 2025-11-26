@@ -31,6 +31,7 @@ typedef struct {
 
 
 // prototipi delle funzioni
+// inserimento libro
 void menuGestioneLibri(Libro **libri, int *ptrNumLibri, int *ptrCapLibri, int numLibri);   // numLibri è il valore del puntatore!!
 
 Libro* inserisciNuovoLibro(Libro *libri, int *ptrNumLibri, int *ptrCapLibri);
@@ -39,7 +40,7 @@ void cercaLibroPerISBN(Libro *libri,int numLibri);
 int formatoCorrettoISBN(char *s);
 void cercaLibriPerAutore(Libro *libri,int numLibri);
 void libriDisponibiliPerPrestito(Libro *libri,int numLibri);
-
+int menu_errore_inserimento_ISBN();
 // Registrazione prestiti
 void menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestito* database_prestiti,int* utenti_inseriti, int* libri_inseriti,int* prestiti_inseriti,int* capacita_attuale_prestiti);
 
@@ -272,7 +273,7 @@ void salvaDatabaseSuFileBinario(Libro *libri, int numLibri, Utente *utenti, int 
         fwrite(&numLibri, sizeof(int), 1, fp);
         
         // Scrivo l'array completo se ci sono libri
-        if (numLibri > 0 && libri != NULL) {
+        if (numLibri > 0) {
             if (fwrite(libri, sizeof(Libro), numLibri, fp) != numLibri) {
                 printf("Attenzione: Errore durante la scrittura dei dati dei libri.\n");
             }
@@ -288,7 +289,7 @@ void salvaDatabaseSuFileBinario(Libro *libri, int numLibri, Utente *utenti, int 
     }else{
         fwrite(&numUtenti, sizeof(int), 1, fp);
         
-        if (numUtenti > 0 && utenti != NULL) {
+        if (numUtenti > 0) {
             if (fwrite(utenti, sizeof(Utente), numUtenti, fp) != numUtenti) {
                 printf("Attenzione: Errore durante la scrittura dei dati degli utenti.\n");
             }
@@ -303,7 +304,7 @@ void salvaDatabaseSuFileBinario(Libro *libri, int numLibri, Utente *utenti, int 
     } else {
         fwrite(&numPrestiti, sizeof(int), 1, fp);
         
-        if (numPrestiti > 0 && prestiti != NULL) {
+        if (numPrestiti > 0) {
             if (fwrite(prestiti, sizeof(Prestito), numPrestiti, fp) != numPrestiti) {
                 printf("Attenzione: Errore durante la scrittura dei dati dei prestiti.\n");
             }
@@ -840,7 +841,7 @@ void menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capa
     int scelta;
     do { 
         // Stampa menù gestione utenti
-        printf("=== MENU GESTIONE UTENTI ===\n");
+        printf("\n=== MENU GESTIONE UTENTI ===\n");
         printf("  1. Inserisci nuovo utente\n");
         printf("  2. Visualizza tutti gli utenti;\n");
         printf("  3. Cerca utente per codice\n");
@@ -921,9 +922,9 @@ int inserimento_dati_utenti(Utente* database_utenti,int* utenti_inseriti) {
 
     // Inserimento nome e cognome
     printf("  - Nome: ");
-    scanf("%50s",database_utenti[*(utenti_inseriti)].nome);
+    scanf(" %50[^\n]",database_utenti[*(utenti_inseriti)].nome);
     printf("  - Cognome: ");
-    scanf("%50s",database_utenti[*(utenti_inseriti)].cognome);
+    scanf(" %50[^\n]",database_utenti[*(utenti_inseriti)].cognome);
 
     // Inserimento data
     inserimento_data_iscrizione(database_utenti,utenti_inseriti);
@@ -1426,7 +1427,7 @@ void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti) {
             printf("  Email: %s\n",database_utenti[src_flag].email);
             printf("  Codice utente: %d\n",database_utenti[src_flag].codice_utente);
             printf("  Data di iscrizione: %s\n",database_utenti[src_flag].data_iscrizione);
-            printf("\nVerrai, ora, indirizzato al menù gestione utenti.");
+            printf("\nVerrai, ora, indirizzato al menù gestione utenti.\n");
         }
     } while (src_flag == -1);
 
@@ -1523,6 +1524,7 @@ Prestito* registra_prestito(Libro* database_libri,Utente* database_utenti,Presti
             printf("Formato non valido! Formato corretto: gg/mm/aaaa. Riprova: \n");
         }
     } while(invalida_data(data));
+    printf("\nPrestito inserito correttamente!\n");
     strcpy(database_prestiti[*prestiti_inseriti].data_prestito,data);
 
     // Calcolo data_restituzione_prevista
@@ -1622,7 +1624,7 @@ int menu_codice_ISBN_non_valido() {
 void controlla_esistenza_libro(Libro* database_libri,int libri_inseriti,char ISBN[],int* posizione_libro) {
     for (int i=0;i<libri_inseriti;i++) {
         if (strcmp(ISBN,database_libri[i].codice_ISBN)==0) {
-            printf("Libro trovato correttamente!\n");
+            printf("\nLibro trovato correttamente!\n");
             *posizione_libro=i;
             return;
         } 
@@ -1635,7 +1637,7 @@ void controlla_esistenza_libro(Libro* database_libri,int libri_inseriti,char ISB
 
 int richiesta_codice_ISBN(Libro* database_libri,int libri_inseriti,char ISBN[],int* posizione_libro) {
     do {
-        printf("\nInserisci il codice ISBN del libro: ");
+        printf("\nInserisci il codice ISBN del libro (XXX-X-XXXX-XXXX-X): ");
         scanf("%17s",ISBN);
 
         // Controllo inserimento ISBN
@@ -1881,9 +1883,11 @@ int menu_codice_prestito_errato() {
 // funzione visualizza prestiti attivi
 void visualizza_prestiti_attivi(Utente* database_utenti,Prestito* database_prestiti,Libro* database_libri,int libri_inseriti,int prestiti_inseriti,int utenti_inseriti) {
     printf("\nEcco tutti i prestiti attivi al momento:\n");
+    int numero_prestiti_attivi=0;
     for (int i=0;i<prestiti_inseriti;i++) { // Ciclo sui prestiti inseriti
         if (database_prestiti[i].restituito==0) {
-            printf("\nPrestito %d:\n",i+1);
+            numero_prestiti_attivi++;
+            printf("\nPrestito %d:\n",numero_prestiti_attivi);
             printf("\n  1. Codice prestito: %d\n",database_prestiti[i].codice_prestito);
             
             // Ricerca titolo e stampa
@@ -1933,6 +1937,8 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
                 if (database_utenti[i].codice_utente == codice) {
                     flag = 0;
                     printf("\nUtente trovato correttamente!\n");
+                } else {
+                    printf("Utente non trovato! Riprova:");
                 }
             }
         } 
@@ -1951,11 +1957,11 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
     }
 
     // Ciclo per scrittura prestiti non restituiti
+    printf("\nPrestiti non restituiti:\n");
     for (int i=0;i<prestiti_inseriti;i++) {
         if (database_prestiti[i].codice_utente == codice) {
-            printf("\nPrestiti non restituiti:\n");
             if (database_prestiti[i].restituito == 0) {
-                stampa_prestito(database_prestiti,i,indice_prestito_non_restituito++);
+                stampa_prestito(database_prestiti,i,++indice_prestito_non_restituito);
             }
         } else {
             if (capacita_posizioni_restituiti<=++indice_prestito_non_restituito) { // Eventuale riallocazione dinamica di posizioni_restituiti
@@ -1977,6 +1983,8 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
     }
 
     free(posizioni_restituiti);
+
+    return;
 }
 
 void stampa_prestito(Prestito* database_prestiti,int indice_prestito_assoluto,int indice_prestito_nel_ciclo_specifico) {
@@ -1988,6 +1996,28 @@ void stampa_prestito(Prestito* database_prestiti,int indice_prestito_assoluto,in
     printf("  5. Data di restituzione prevista: %s\n",database_prestiti[indice_prestito_assoluto].data_restituzione_prevista);
 } 
 
+
+int menu_errore_inserimento_ISBN() {
+    int scelta = 0;
+    printf("\nCosa vuoi fare?\n");
+    printf("  1. Inserire un nuovo codice ISBN\n");
+    printf("  2. Annullare l'inserimento del libro e tornare al menu\n");
+    printf("La tua scelta: ");
+    
+    do {
+        scanf("%d", &scelta);
+        switch (scelta) {
+            case 1:
+                return 0; // Riprova
+            case 2:
+                return -1; // Annulla
+            default:
+                printf("Scelta non valida. Inserisci 1 o 2: ");
+                break;
+        }
+    } while (scelta != 1 && scelta != 2);
+    return 0;
+}
 
 // Funzione inserisciNuovoLibro
 Libro* inserisciNuovoLibro(Libro *libri,int *ptrNumLibri,int* ptrCapLibri){
@@ -2013,17 +2043,26 @@ Libro* inserisciNuovoLibro(Libro *libri,int *ptrNumLibri,int* ptrCapLibri){
 
     if (invalida_ISBN(ISBN_temp)) {  // se non è valido ritorna 1
         printf("Formato ISBN NON valido. Riprova.\n");
-        continue;
     }
-
-    // controllo eventuali duplicati (il codice ISBN è univoco)
-    for (int i = 0; i < *ptrNumLibri; i++) {
-        if (!strcmp(libri[i].codice_ISBN, libri[*ptrNumLibri].codice_ISBN)) {
-            printf("ISBN già presente nella libreria. Riprova.\n");
-            duplicato=1;
-            break;
+    else{
+        // controllo eventuali duplicati (il codice ISBN è univoco)
+        for (int i = 0; i < *ptrNumLibri; i++) {
+            if (!strcmp(ISBN_temp, libri[i].codice_ISBN)) {
+                printf("ISBN già presente nella libreria. Riprova.\n");
+                duplicato=1;
+                break;
+            }
         }
     }
+    if (invalida_ISBN(ISBN_temp) || duplicato == 1) {
+            int exit_flag;
+            exit_flag = menu_errore_inserimento_ISBN();
+            
+            if (exit_flag == -1) {
+                printf("\nInserimento annullato.\n");
+                return libri; // Esce dalla funzione tornando al menu principale
+            }
+        }
     // ripeti finché non valido o duplicato
 } while (invalida_ISBN(ISBN_temp) || duplicato == 1);
 
@@ -2113,61 +2152,51 @@ void cercaLibroPerISBN(Libro *libri,int numLibri){
         return;
     }
 
-    int srcFlag = -1;
     char isbnInserito[18];
+    int srcFlag;
     do{
+        srcFlag = -1;
         // inserimento codice ISBN
         printf("Inserisci codice ISBN (formato XXX-X-XXXX-XXXX-X): \n");
         scanf("%17s", isbnInserito);
         if (invalida_ISBN(isbnInserito)) {
         printf("Formato ISBN NON valido. Riprova.\n"); 
-        continue;
+        }
+        else{
+            // ricerca isbn inserito:
+            for(int i = 0; i < numLibri; i++){
+                if(!strcmp(isbnInserito,libri[i].codice_ISBN)){
+                    srcFlag = i;
+                    break;
+                }
+            }
+        
+            if(srcFlag == -1){
+                printf("\nERRORE: Non è stato trovato nessun libro con questo codice ISBN.\n");
+            }
         }
 
-        // ricerca isbn inserito:
-        for(int i = 0; i < numLibri; i++){
-            if(!strcmp(isbnInserito,libri[i].codice_ISBN)){
-            srcFlag = i;
-            break;
+        // Controllo errore: Se il formato è invalido OPPURE il libro non è stato trovato
+        if(invalida_ISBN(isbnInserito) || srcFlag == -1){
+            
+            int exit_flag = menu_errore_inserimento_ISBN(); 
+
+            // Se la funzione ritorna -1 (exit flag), esco dalla ricerca
+            if (exit_flag == -1) {
+                return; 
             }
-        } 
-    
-    // stampo i risultati ottenuti
-    if(srcFlag == -1){  // se l'isbn non è stato trovato, è possibile inserire un altro codice oppure tornare alla gestione libri
-        int scelta;
-        printf("\n Non è stato trovato nessun libro con il codice ISBN inserito!\n");
-        printf("Cosa vuoi fare?\n");
-        printf("\n  1. Inserire un altro codice ISBN da cercare;\n");
-        printf("  2. Tornare al menù gestione libri.\n");
-        printf("\nLa tua scelta: ");
+        }
 
-        do{ // ciclo per la scelta del isbn
-            //inserimento scelta:
-            scanf("%d",&scelta);
-            switch (scelta)
-            {
-            case 1:
-                break;
+    } while(invalida_ISBN(isbnInserito) || srcFlag == -1);
 
-            case 2:
-                return;
-
-            default:
-                printf("La tua scelta deve essere 1 oppure 2! Riprova:\n");
-                printf("\nLa tua scelta: ");
-                break;
-            }
-        }while (scelta!=1 && scelta != 2);
-    } else{   // se il libro viene trovato, ne vengono stampati i dati(indice srcFlag):
-        printf("\nLibro trovato! \n");
-        printf("Codice ISBN: %s\n",libri[srcFlag].codice_ISBN);
-        printf("Titolo: %s\n",libri[srcFlag].titolo);
-        printf("Autore: %s\n",libri[srcFlag].autore);
-        printf("Anno di pubblicazione: %d\n",libri[srcFlag].anno_pubblicazione);
-        printf("Numero di copie: %d\n", libri[srcFlag].numero_copie);
-        printf("Genere: %s\n",libri[srcFlag].genere);
-    }
-    }while(srcFlag == -1 || invalida_ISBN(isbnInserito));
+    // Se arrivo qui, il libro è stato trovato (srcFlag != -1)
+    printf("\n=== LIBRO TROVATO ===\n");
+    printf("Codice ISBN:         %s\n", libri[srcFlag].codice_ISBN);
+    printf("Titolo:              %s\n", libri[srcFlag].titolo);
+    printf("Autore:              %s\n", libri[srcFlag].autore);
+    printf("Anno di pubblicazione: %d\n", libri[srcFlag].anno_pubblicazione);
+    printf("Numero di copie:     %d\n", libri[srcFlag].numero_copie);
+    printf("Genere:              %s\n", libri[srcFlag].genere);
 }
 
 
