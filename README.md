@@ -18,13 +18,14 @@ Riga 666: a che serve quella funzione ? ins ?
 
 
 
-RICORDARSI: Inserire menu uscita da inserimento libri
-            Formattazione buggata su: cerca libri per autore
-            CONTROLLO Se non ci sono utenti da fare
-            MENU in "Inserisci il codice dell'utente che stai cercando"
-            NON STAMPA I PRESTITI RESTITUITI
-            CONTROLLO Se non ci sono libri da fare (Statistiche e report)
-            INSERIRE L'if per la scrittura dei libri nella gestione statistiche e report (Anche 1 volte nei top 5 libri)
-            INSERIRE "AGGIUNGI COPIE"
-            TOP 5 LIBRI con vettore di indici
-            Se Libri/Utenti/Prestiti == NULL Nella lettura del database, bisogna uscire da tutto il programma (e fare i vari free)
+RICORDARSI: Inserire menu uscita da inserimento libri (ANTO)
+            Formattazione buggata su: cerca libri per autore (ANTO)
+            CONTROLLO Se non ci sono utenti da fare (ANTO)
+            MENU in "Inserisci il codice dell'utente che stai cercando" (RICK)
+            NON STAMPA I PRESTITI RESTITUITI (RICK)
+            CONTROLLO Se non ci sono libri da fare (Statistiche e report) (ANTO)
+            INSERIRE L'if per la scrittura dei libri nella gestione statistiche e report (Anche 1 volte nei top 5 libri) (ANTO)
+            INSERIRE "AGGIUNGI COPIE" (futuro)
+            TOP 5 LIBRI con vettore di indici (ANTO)
+            Se Libri/Utenti/Prestiti == NULL Nella lettura del database, bisogna uscire da tutto il programma (e fare i vari free) (RICK)
+            TEST da riscrivere (ANTO)
