@@ -1,0 +1,208 @@
+ID Test: T01
+Funzionalità testata:  Menu gestione libri -> visualizza tutti i libri nel caso in cui non è stato inserito alcun libro
+Input fornito: 2
+Output atteso: Nessun libro presente + ritorno al menu precedente
+Output ottenuto: Nessun libro presente + ritorno al menu precedente
+Esito: 1
+Screen
+
+ID Test: T02
+Funzionalità testata: Menu gestione libri -> cerca libro per isbn nel caso in cui non è stato inserito alcun libro
+Input fornito: 3
+Output atteso: Nessun libro presente + ritorno al menu precedente
+Output ottenuto: Nessun libro presente + ritorno al menu precedente
+Esito: 1
+Screen
+
+ID Test: T03
+Funzionalità testata: Menu gestione libri -> cerca libri per autore nel caso in cui non è stato inserito alcun libro
+Input fornito: 4
+Output atteso: Nessun libro presente + ritorno al menu precedente
+Output ottenuto: Nessun libro presente + ritorno al menu precedente
+Esito: 1
+Screen
+
+ID Test: T04
+Funzionalità testata: Menu gestione libri -> libri disponibili per il prestito nel caso in cui non è stato inserito alcun libro
+Input fornito: 5
+Output atteso: Nessun libro presente + ritorno al menu precedente
+Output ottenuto: Nessun libro presente + ritorno al menu precedente
+Esito: 1
+Screen
+
+ID Test: T05
+Funzionalità testata: Menu gestione libri -> torna al menu precedente
+Input fornito: 6
+Output atteso: ritorno al menu precedente
+Output ottenuto: ritorno al menu precedent
+Esito: 1
+Screen
+
+ID Test: T06
+Funzionalità testata: Menu gestione libri -> inserimento libri -> corretto inserimento del codice isbn (XXX-X-XXXX-XXXX-X)
+Input fornito: 12a-3-4567-8901-2
+Output atteso: Formato ISBN NON valido. Riprova. + menu di scelta uscita
+Output ottenuto: Formato ISBN NON valido. Riprova. + menu di scelta uscita
+Esito: 1
+Screen
+
+ID Test: T07
+Funzionalità testata: Menu gestione libri -> inserimento libri -> corretto inserimento del codice isbn (XXX-X-XXXX-XXXX-X)
+Input fornito: 1111-2222-3333-4
+Output atteso: Formato ISBN NON valido. Riprova. + menu di scelta uscita
+Output ottenuto: Formato ISBN NON valido. Riprova. + menu di scelta uscita
+Esito: 1
+Screen
+
+ID Test: T08
+Funzionalità testata: Menu gestione libri -> inserimento libri -> corretto inserimento data di pubblicazione del libro (compresa fra 1800 e 2025)
+Input fornito: 2026 e 1799
+Output atteso: Anno di pubblicazione non valido(deve essere compreso fra 1800 e 2025) e nuova richiesta inserimento data di pubblicazione del libro
+Output ottenuto: Anno di pubblicazione non valido(deve essere compreso fra 1800 e 2025) e nuova richiesta inserimento data di pubblicazione del libro
+Esito: 1
+Screen
+
+ID Test: T09 
+Funzionalità testata: Menu gestione libri -> inserimento libri -> corretto inserimento numero di copie (>0)
+Input fornito: -1
+Output atteso: Numero di copie non valido (deve essere >0) e nuova richiesta inserimento numero di copie
+Output ottenuto: Numero di copie non valido (deve essere >0) e nuova richiesta inserimento numero di copie
+Esito: 1
+Screen
+
+ID Test: T10
+Funzionalità testata: Menu gestione libri -> inserimento libri -> corretto inserimento completo dei valori in tutti i campi
+Input fornito: {222-3-4444-5555-6; Titolo 1; Autore 1; 2025; 2; Genere 1}
+Output atteso: Libro inserito con successo ! + ritorno al menu Gestione libro
+Output ottenuto: Libro inserito con successo ! + ritorno al menu Gestione libro
+Esito: 1
+Screen
+
+ID Test: T11
+Funzionalità testata: Menu gestione libri -> inserimento libri -> inserimento isbn già presente nel database
+Input fornito: 222-3-4444-5555-6 (già presente nel database)
+Output atteso: Isbn già presente nella libreria! Riprova! + menu scelta
+Output ottenuto: Isbn già presente nella libreria! Riprova! + menu scelta
+Esito: 1
+Screen
+
+ID Test: T12
+Funzionalità testata: Menu gestione utenti -> inserimento nuovo utente -> corretto inserimento completo dei valori in tutti i campi
+Input fornito: {1; Nome 1; Cognome 1; 01/01/2025; email1@sito1}
+Output atteso: Utente inserito correttamente ! + ritorno al menu gestione utenti
+Output ottenuto: Utente inserito correttamente ! + ritorno al menu gestione utenti
+Esito: 1
+Screen
+
+ID Test: T13
+Funzionalità testata: Menu gestione utenti -> inserimento nuovo utente -> corretto inserimento codice utente (deve essere >0 e univoco)
+Input fornito: -1  e  1(codice già presente)
+Output atteso: Il codice utente deve essere positivo! Riprova    e    Il codice inserito è già esistente + menu scelta
+Output ottenuto: Il codice utente deve essere positivo! Riprova    e    Il codice inserito è già esistente + menu scelta
+Esito: 1
+Screen
+
+ID Test: T14
+Funzionalità testata:  Menu gestione utenti -> inserimento nuovo utente -> corretto inserimento data iscrizione utente (formato gg/mm/aaaa)
+Input fornito: 1a/12/2025  e  1112/2025
+Output atteso: Il formato della data deve essere gg/mm/aaaa ! riprova! (x2)
+Output ottenuto: Il formato della data deve essere gg/mm/aaaa ! riprova! (x2)
+Esito: 1
+Screen
+
+ID Test: T15
+Funzionalità testata: Menu gestione utenti -> inserimento nuovo utente -> corretto inserimento email (deve contenere @)
+Input fornito: email
+Output atteso: E obbligatorio inserire una chiocciola(@)! Riprova
+Output ottenuto: E obbligatorio inserire una chiocciola(@)! Riprova
+Esito: 1
+Screen
+
+ID Test: T16
+Funzionalità testata: Menu gestione utenti -> ricerca utente per codice
+Input fornito: 7 (non esistente)
+Output atteso: Non è stato trovato alcun utente con il codice inserito! + menu di scelta
+Output ottenuto: Non è stato trovato alcun utente con il codice inserito! + menu di scelta
+Esito: 1
+Screen
+
+ID Test: T17
+Funzionalità testata: Menu gestione prestiti -> registra restituzione di un libro, visualizza tutti i prestiti attivi, visualizza lo storico dei prestiti di un utente nel caso in cui non sono stati inseriti prrestiti
+Input fornito: 2 , 3, 4
+Output atteso: Non sono presenti prestiti. Per questo motivo le uniche scelte ammesse sono 1 e 5. Riprova:
+Output ottenuto: Non sono presenti prestiti. Per questo motivo le uniche scelte ammesse sono 1 e 5. Riprova:
+Esito: 1
+Screen
+
+ID Test: T18
+Funzionalità testata: Menu gestione prestiti -> registra nuovo prestito o(libri e utente esistenti)
+Input fornito: {222-3-4444-5555-6; 1; 26/11/2025}
+Output atteso: Libro trovato correttamente, utente trovato correttamente , nuovo prestito registrato correttamente
+Output ottenuto: Libro trovato correttamente, utente trovato correttamente , nuovo prestito registrato correttamente
+Esito: 1
+Screen
+
+ID Test: T19
+Funzionalità testata: Menu gestione prestiti -> registra nuovo prestito -> corretto codice isbn inserit(codice isbn formato errato (x2) e libro non disponibile con tale codice isbn)
+Input fornito: 1a1-2-3333-4444-5   e   1112-3333-4444-5   e    1112-3333-4444-5
+Output atteso:  Il codice isbn è stato inserito con il formato errato + menu di scelta (x2)    e    Non è stato trovato alcun libro con tale codice + menu di scelta
+Output ottenuto: Il codice isbn è stato inserito con il formato errato + menu di scelta (x2)    e    Non è stato trovato alcun libro con tale codice + menu di scelta
+Esito: 1
+Screen
+
+ID Test: T21
+Funzionalità testata: Menu gestione prestiti -> registra nuovo prestito -> corretto formato della data del prestito (gg/mm/aaaa)
+Input fornito: 1a/12/2025   e   1112/2025
+Output atteso: Il formato della data deve essere gg/mm/aaaa ! riprova! (x2)
+Output ottenuto: Il formato della data deve essere gg/mm/aaaa ! riprova! (x2)
+Esito: 1
+Screen
+
+ID Test: T22
+Funzionalità testata: Menu gestione prestiti -> registra restituzione libro (con codice del prestito univoco dell'utente inesistente)
+Input fornito: 3 (non esistente in database)
+Output atteso: Il codice del prestito è inesistente + menu di scelta
+Output ottenuto: Il codice del prestito è inesistente + menu di scelta
+Esito: 1
+Screen
+
+ID Test: T01
+Funzionalità testata:
+Input fornito:
+Output atteso:
+Output ottenuto:
+Esito: 1
+Screen
+
+ID Test: T01
+Funzionalità testata:
+Input fornito:
+Output atteso:
+Output ottenuto:
+Esito: 1
+Screen
+
+ID Test: T01
+Funzionalità testata:
+Input fornito:
+Output atteso:
+Output ottenuto:
+Esito: 1
+Screen
+
+ID Test: T01
+Funzionalità testata:
+Input fornito:
+Output atteso:
+Output ottenuto:
+Esito: 1
+Screen
+
+ID Test: T01
+Funzionalità testata:
+Input fornito:
+Output atteso:
+Output ottenuto:
+Esito: 1
+Screen
+
