@@ -44,3 +44,5 @@ controlli chiesti dal professore:
 10. Statistiche con database vuoto
 11. Statistiche con database popolato
 12. Gestione array pieno
+
+T06 e T07 e T11 screenshot da rifare, non ce il menu di scelta dopo l'inserimento sballato del codice isbn
