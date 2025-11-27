@@ -29,6 +29,9 @@ RICORDARSI: Inserire menu uscita da inserimento libri (ANTO)
             TOP 5 LIBRI con vettore di indici (ANTO)
             Se Libri/Utenti/Prestiti == NULL Nella lettura del database, bisogna uscire da tutto il programma (e fare i vari free) (RICK)
             TEST da riscrivere (ANTO)
+            CONTROLLO "return" in funzioni void (ANTO)
+            Inserire CONTROLLO risposta 'S' e 'N' nella funzione ESCI (ANTO)
+            Togliere **libri e lasciare *libri (ANTO)
 
 
 controlli chiesti dal professore:
