@@ -1971,7 +1971,7 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
                 stampa_prestito(database_prestiti,i,++indice_prestito_non_restituito);
             }
         } else {
-            if (capacita_posizioni_restituiti<=++indice_prestito_non_restituito) { // Eventuale riallocazione dinamica di posizioni_restituiti
+            if (capacita_posizioni_restituiti<=++indice_prestito_restituito) { // Eventuale riallocazione dinamica di posizioni_restituiti
                 posizioni_restituiti = realloc(posizioni_restituiti,2*capacita_posizioni_restituiti*sizeof(int));
                 if (posizioni_restituiti==NULL) {
                     printf("\nErrore di allocazione in memoria! Verrai reindirizzato al menù gestione prestiti.\n");
