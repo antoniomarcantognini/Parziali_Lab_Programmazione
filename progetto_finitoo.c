@@ -967,7 +967,7 @@ int menu_codice_utente() {
             printf("Riprova:\n");
             break; 
         } 
-    } while (scelta != 1 && scelta != 2);
+    } while (1);
 }
 
 int inserimento_codice_utente(Utente* database_utenti, int* utenti_inseriti) {
@@ -1410,7 +1410,7 @@ void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti) {
                     printf("\nLa tua scelta: ");
                     break;
                 }
-            } while (scelta!=1 && scelta != 2);
+            } while (1);
         } else { // Se l'utente viene trovato, vengono stampati i suoi dati.
             printf("Utente trovato!\n");
             printf("  Nome: %s\n",database_utenti[src_flag].nome);
@@ -1608,7 +1608,7 @@ int menu_codice_ISBN_non_valido() {
             printf("\nLa scelta deve essere 1 oppure 2! Riprova: ");
             break;
         }
-    } while(scelta != 1 && scelta != 2);
+    } while(1);
 }
 
 
@@ -1716,7 +1716,7 @@ int menu_codice_utente_non_valido() {
             printf("\nLa scelta deve essere 1 oppure 2! Riprova: ");
             break;
         }
-    } while(scelta != 1 && scelta != 2);
+    } while(1);
 }
 
 
@@ -1866,7 +1866,7 @@ int menu_codice_prestito_errato() {
             printf("\nLa scdlta deve esserd 1 oppure 2! Riprova:\n");
             break;
         }
-    } while (scelta!=1 && scelta!=2);
+    } while (1);
     return 0;
 
 }
@@ -2028,7 +2028,7 @@ int menu_errore_inserimento_ISBN() {
                 printf("Scelta non valida. Inserisci 1 o 2: ");
                 break;
         }
-    } while (scelta != 1 && scelta != 2);
+    } while (1);
     return 0;
 }
 
@@ -2264,7 +2264,7 @@ void cercaLibriPerAutore(Libro *libri,int numLibri){
                 if (scelta == 1) break;
                 if (scelta == 2) return;
                 printf("La tua scelta deve essere 1 oppure 2! Riprova:\n");
-            } while (scelta!=1 && scelta != 2);
+            } while (1);
             
             if (scelta == 1) continue; // Continua con il ciclo do-while
         }
