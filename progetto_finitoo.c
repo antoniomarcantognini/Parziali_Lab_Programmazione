@@ -1923,7 +1923,18 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
                     flag = 0;
                     printf("\nUtente trovato correttamente!\n");
                 } else {
-                    printf("Utente non trovato! Riprova:");
+                    printf("Utente non trovato!\n");
+                    printf("Cosa vuoi fare?\n");
+                    printf("\n  1. Inserire un altro nome dell'autore da cercare;\n");
+                    printf("  2. Tornare al menù gestione libri.\n");
+                    printf("\nLa tua scelta: ");
+        
+                    do{ // ciclo per la scelta dell'utente
+                        scanf("%d",&scelta);
+                        if (scelta == 1) break;
+                        if (scelta == 2) return;
+                        printf("La tua scelta deve essere 1 oppure 2! Riprova:\n");
+                    } while (1);
                 }
             }
         } 
@@ -2187,7 +2198,7 @@ void cercaLibroPerISBN(Libro *libri,int numLibri){
 
 // funzione cerca libri per autore  libri,numLibri
 void cercaLibriPerAutore(Libro *libri,int numLibri){
-    if (libri == NULL || numLibri <= 0) {
+    if (numLibri <= 0) {
         printf("Nessun libro presente.\n");
         return;
     }
@@ -2212,11 +2223,11 @@ void cercaLibriPerAutore(Libro *libri,int numLibri){
                 
                 // Stampa i dettagli del libro trovato
                 printf("\n");
-                printf("Titolo:              %s\n", libri[i].titolo);
-                printf("Codice ISBN:         %s\n", libri[i].codice_ISBN);
+                printf("Titolo:                %s\n", libri[i].titolo);
+                printf("Codice ISBN:           %s\n", libri[i].codice_ISBN);
                 printf("Anno di pubblicazione: %d\n", libri[i].anno_pubblicazione);
-                printf("Numero di copie:     %d\n", libri[i].numero_copie);
-                printf("Genere:              %s\n", libri[i].genere);
+                printf("Numero di copie:       %d\n", libri[i].numero_copie);
+                printf("Genere:                %s\n", libri[i].genere);
 
                 libriTrovati++; // Incrementa il contatore dei libri trovati
             }
