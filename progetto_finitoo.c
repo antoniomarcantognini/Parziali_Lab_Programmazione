@@ -1916,7 +1916,18 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
     do {
         scanf("%d",&codice);
         if (codice<=0) {
-            printf("\nIl codice deve essere positivo! Riprova: ");
+            printf("\nIl codice deve essere positivo!\n");
+            printf("Cosa vuoi fare?\n");
+            printf("\n  1. Inserire un altro nome dell'autore da cercare;\n");
+            printf("  2. Tornare al menù gestione libri.\n");
+            printf("\nLa tua scelta: ");
+
+            do{ // ciclo per la scelta dell'utente
+                scanf("%d",&scelta);
+                if (scelta == 1) break;
+                if (scelta == 2) return;
+                printf("La tua scelta deve essere 1 oppure 2! Riprova:\n");
+            } while (1);
         } else {
             for (int i=0;i<utenti_inseriti;i++) {
                 if (database_utenti[i].codice_utente == codice) {
