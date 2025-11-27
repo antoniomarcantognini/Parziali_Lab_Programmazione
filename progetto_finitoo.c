@@ -196,8 +196,19 @@ do{
             break;
         case 'E':
             int flagGestioneFile = menuGestioneFile(&libri, ptrNumLibri, ptrCapLibri, &utenti, ptrNumUtenti, ptrCapUtenti, &prestiti, ptrNumPrestiti, ptrCapPrestiti);
-            if (flagGestioneFile == -1) {
-                return;
+            if (flagGestioneFile == -1) { // Libero la memoria evitando la variabile che ha dato errore
+                if (libri == NULL) {
+                    free(prestiti);
+                    free(utenti);
+                } else {
+                    free(libri);
+                    if (prestiti == NULL) {
+                        free(utenti);
+                    } else {
+                        free(prestiti);
+                    }
+                }
+                return 1;
             }
             break;
         case 'F':
@@ -381,9 +392,9 @@ int caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Ute
             *utenti = (Utente*)malloc(nuovaCapacita * sizeof(Utente));
 
             if (*utenti == NULL) {
-                printf("Errore allocazione memoria utenti!\n");
-                *numUtenti = 0; *capUtenti = 5;
-                *utenti = (Utente*)malloc(5 * sizeof(Utente));
+                printf("Errore critico di allocazione memoria per gli utenti!\n");
+                printf("Il programma verrà chiuso");
+                return -1;
             } else {
                 int letti = fread(*utenti, sizeof(Utente), tempNum, fp);
                 if (letti == tempNum) {
@@ -410,9 +421,9 @@ int caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Ute
             *prestiti = (Prestito*)malloc(nuovaCapacita * sizeof(Prestito));
 
             if (*prestiti == NULL) {
-                printf("Errore allocazione memoria prestiti!\n");
-                *numPrestiti = 0; *capPrestiti = 5;
-                *prestiti = (Prestito*)malloc(5 * sizeof(Prestito));
+                printf("Errore critico di allocazione memoria per i prestiti!\n");
+                printf("Il programma verrà chiuso");
+                return -1;
             } else {
                 int letti = fread(*prestiti, sizeof(Prestito), tempNum, fp);
                 if (letti == tempNum) {
@@ -432,7 +443,7 @@ int caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Ute
 
 // funzione esporta catalogo in formato testo
 void esportaCatalogoInFormatoTesto(Libro *libri, int numLibri) {
-    if (numLibri == 0 || libri == NULL) {
+    if (numLibri == 0) {
         printf("Nessun libro da esportare.\n");
         return;
     }
@@ -463,7 +474,7 @@ void esportaCatalogoInFormatoTesto(Libro *libri, int numLibri) {
 
 // funzione esporta report prestiti in formato testo
 void esportaReportPrestitiInFormatoTesto(Prestito *prestiti, int numPrestiti, Libro *libri, int numLibri, Utente *utenti, int numUtenti) {
-    if (numPrestiti == 0 || prestiti == NULL) {
+    if (numPrestiti == 0) {
         printf("Nessun prestito da esportare.\n");
         return;
     }
@@ -537,23 +548,10 @@ void esci(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *p
 
     printf("Liberazione della memoria in corso...\n");
     
-    // Controllo e liberazione memoria Libri
-    if (libri != NULL) {
-        free(libri);
-        libri = NULL;
-    }
-    
-    // Controllo e liberazione memoria Utenti
-    if (utenti != NULL) {
-        free(utenti);
-        utenti = NULL;
-    }
+    free(libri);
+    free(utenti)
+    free(prestiti);
 
-    // Controllo e liberazione memoria Prestiti
-    if (prestiti != NULL) {
-        free(prestiti);
-        prestiti = NULL;
-    }
 
     printf("Memoria liberata correttamente.\n");
     printf("Arrivederci!\n");
