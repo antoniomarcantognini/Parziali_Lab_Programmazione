@@ -106,10 +106,10 @@ void libriPerGenere(Libro* database_libri, int libri_inseriti);
 void top5LibriPiuPrestati(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti);
 
 // Prototipi menu salvataggio su file
-void menuGestioneFile(Libro **libri, int *numLibri, int *capLibri, Utente **utenti, int *numUtenti, int *capUtenti, Prestito **prestiti, int *numPrestiti, int *capPrestiti);
+int menuGestioneFile(Libro **libri, int *numLibri, int *capLibri, Utente **utenti, int *numUtenti, int *capUtenti, Prestito **prestiti, int *numPrestiti, int *capPrestiti);
 void salvaDatabaseSuFileBinario(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti);
 // Prototipi futuri
-void caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Utente **utenti, int *numUtenti, int *capUtenti, Prestito **prestiti, int *numPrestiti, int *capPrestiti);  // cap... è la capacità attuale
+int caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Utente **utenti, int *numUtenti, int *capUtenti, Prestito **prestiti, int *numPrestiti, int *capPrestiti);  // cap... è la capacità attuale
 void esportaCatalogoInFormatoTesto(Libro *libri, int numLibri);
 void esportaReportPrestitiInFormatoTesto(Prestito *prestiti, int numPrestiti, Libro *libri, int numLibri, Utente *utenti, int numUtenti);
 void esci(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti);
@@ -117,9 +117,9 @@ void esci(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *p
 int main(){
 // funzione menu principale:
 // dichiaro le variabili fuori dal do-while
-    Libro *libri = NULL;
-    Utente *utenti = NULL;
-    Prestito *prestiti = NULL;
+    Libro *libri;
+    Utente *utenti;
+    Prestito *prestiti;
         
     int capacitaMaxLibri = 5;   // parto da 5 e poi la raddoppio nel realloc
     int* ptrCapLibri = &capacitaMaxLibri;
@@ -195,7 +195,10 @@ do{
             menuGestioneStatisticheReport(libri, utenti, prestiti, *ptrNumLibri, *ptrNumUtenti, *ptrNumPrestiti);  // qui ho aggiunto *
             break;
         case 'E':
-            menuGestioneFile(&libri, ptrNumLibri, ptrCapLibri, &utenti, ptrNumUtenti, ptrCapUtenti, &prestiti, ptrNumPrestiti, ptrCapPrestiti);
+            int flagGestioneFile = menuGestioneFile(&libri, ptrNumLibri, ptrCapLibri, &utenti, ptrNumUtenti, ptrCapUtenti, &prestiti, ptrNumPrestiti, ptrCapPrestiti);
+            if (flagGestioneFile == -1) {
+                return;
+            }
             break;
         case 'F':
             break;
@@ -211,7 +214,7 @@ return 0;
 }
 
 // === MENU GESTIONE FILE === //
-void menuGestioneFile(Libro **libri, int *numLibri, int *capLibri, Utente **utenti, int *numUtenti, int *capUtenti, Prestito **prestiti, int *numPrestiti, int *capPrestiti){
+int menuGestioneFile(Libro **libri, int *numLibri, int *capLibri, Utente **utenti, int *numUtenti, int *capUtenti, Prestito **prestiti, int *numPrestiti, int *capPrestiti){
     int scelta;
     do{
         printf("=== MENU GESTIONE FILE ===\n");
@@ -231,7 +234,10 @@ void menuGestioneFile(Libro **libri, int *numLibri, int *capLibri, Utente **uten
             break;
             
             case 2:                   // passiamo il doppio puntatore
-            caricaDatabaseDaFileBinario(libri, numLibri, capLibri, utenti, numUtenti, capUtenti, prestiti, numPrestiti, capPrestiti);
+            int flagCaricaDatabase = caricaDatabaseDaFileBinario(libri, numLibri, capLibri, utenti, numUtenti, capUtenti, prestiti, numPrestiti, capPrestiti);
+            if (flagCaricaDatabase == -1) {
+                return -1;
+            }
             break;
             
             case 3:
@@ -256,6 +262,7 @@ void menuGestioneFile(Libro **libri, int *numLibri, int *capLibri, Utente **uten
         }
 
     }while(scelta!=5);
+    return 0;
 }
 
 // Funzioni gestione file:
@@ -301,6 +308,7 @@ void salvaDatabaseSuFileBinario(Libro *libri, int numLibri, Utente *utenti, int 
     fp = fopen("prestiti.dat","wb");
     if (fp == NULL) {
         printf("Errore critico: Impossibile aprire 'prestiti.dat' per la scrittura.\n");
+        return;
     } else {
         fwrite(&numPrestiti, sizeof(int), 1, fp);
         
@@ -317,7 +325,7 @@ void salvaDatabaseSuFileBinario(Libro *libri, int numLibri, Utente *utenti, int 
 }    
 
 // funzione carica database da file binario
-void caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Utente **utenti, int *numUtenti, int *capUtenti, Prestito **prestiti, int *numPrestiti, int *capPrestiti) {
+int caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Utente **utenti, int *numUtenti, int *capUtenti, Prestito **prestiti, int *numPrestiti, int *capPrestiti) {
     FILE *fp;
     int tempNum;
 
@@ -327,6 +335,7 @@ void caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Ut
     fp = fopen("libri.dat", "rb");
     if (fp == NULL) {
         printf("[!] File 'libri.dat' non trovato. Nessuna modifica ai libri.\n");
+        return 0;
     } else {
         // Leggo il numero di elementi
         fread(&tempNum, sizeof(int), 1, fp);
@@ -343,10 +352,8 @@ void caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Ut
 
             if (*libri == NULL) {
                 printf("Errore critico di allocazione memoria per i libri!\n");
-                *numLibri = 0;
-                *capLibri = 5;
-                // Re-inizializzo piccolo per sicurezza
-                *libri = (Libro*)malloc(5 * sizeof(Libro));
+                printf("Il programma verrà chiuso");
+                return -1;
             } else {
                 // Leggo l'array intero
                 int letti = fread(*libri, sizeof(Libro), tempNum, fp);
@@ -420,6 +427,7 @@ void caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Ut
         fclose(fp);
     }
     printf("Operazione di caricamento completata.\n");
+    return 0;
 }
 
 // funzione esporta catalogo in formato testo
