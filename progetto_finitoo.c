@@ -1015,21 +1015,6 @@ void inserimento_data_iscrizione(Utente* database_utenti, int* utenti_inseriti) 
     strcpy(database_utenti[*(utenti_inseriti)].data_iscrizione,data);
 }
 
-int ins(char *data) {
-    if (strlen(data)!=10) {
-        return 1;
-    }
-    return  data[0] < '0' || data[0] > '9' ||
-            data[1] < '0' || data[1] > '9' ||
-            data[3] < '0' || data[3] > '9' ||
-            data[4] < '0' || data[4] > '9' ||
-            data[6] < '0' || data[6] > '9' ||
-            data[7] < '0' || data[7] > '9' ||
-            data[8] < '0' || data[8] > '9' ||
-            data[9] < '0' || data[9] > '9' ||
-            data[2] != '/' || data[5] != '/';
-}
-
 void inserimento_email(Utente* database_utenti,int* utenti_inseriti) {
     char email[81];
     
