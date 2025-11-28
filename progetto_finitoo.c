@@ -42,7 +42,7 @@ void cercaLibriPerAutore(Libro *libri,int numLibri);
 void libriDisponibiliPerPrestito(Libro *libri,int numLibri);
 int menu_errore_inserimento_ISBN();
 // Registrazione prestiti
-void menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestito* database_prestiti,int* utenti_inseriti, int* libri_inseriti,int* prestiti_inseriti,int* capacita_attuale_prestiti);
+Prestito* menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestito* database_prestiti,int* utenti_inseriti, int* libri_inseriti,int* prestiti_inseriti,int* capacita_attuale_prestiti);
 
 Prestito* registra_prestito(Libro* database_libri,Utente* database_utenti,Prestito* database_prestiti,int* prestiti_inseriti,int* capacita_attuale_prestiti,int libri_inseriti,int utenti_inseriti);
 void richiedi_libro_utente(Libro* database_libri,Utente* database_utenti,int* utenti_inseriti,int libri_inseriti,int*posizione_utente,int* posizione_libro);    
@@ -85,7 +85,7 @@ int menu_codice_utente();
 int invalida_data(char* data);
 
 // Prototipi per visualizzazione degli utenti
-void menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capacita_attuale_utenti);
+Utente* menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capacita_attuale_utenti);
 void visualizza_tutti_gli_utenti(Utente* database_utenti,int utenti_inseriti);
 int stampa_ordine_alfabetico_nomi(Utente* database_utenti,int utenti_inseriti);
 int stampa_ordine_alfabetico_cognomi(Utente* database_utenti,int utenti_inseriti);
@@ -182,10 +182,20 @@ do{
             menuGestioneLibri(&libri, ptrNumLibri, ptrCapLibri);
             break;
          case 'B':
-            menuGestioneUtenti(utenti, ptrNumUtenti, ptrCapUtenti); 
+            Utente* utente_temp;
+            utente_temp = menuGestioneUtenti(utenti, ptrNumUtenti, ptrCapUtenti);
+            if (utente_temp == NULL) {
+                return 1;
+            } 
+            utenti = utente_temp;
             break;
         case 'C':
-            menuGestionePrestiti(utenti, libri, prestiti, ptrNumUtenti, ptrNumLibri, ptrNumPrestiti, ptrCapPrestiti);
+            Prestito* prestito_temp; 
+            prestito_temp = menuGestionePrestiti(utenti, libri, prestiti, ptrNumUtenti, ptrNumLibri, ptrNumPrestiti, ptrCapPrestiti);
+            if (prestito_temp == NULL) {
+                return 1;
+            }
+            prestiti = prestito_temp;
             break;
         case 'D':
             menuGestioneStatisticheReport(libri, utenti, prestiti, *ptrNumLibri, *ptrNumUtenti, *ptrNumPrestiti);  // qui ho aggiunto *
@@ -241,7 +251,7 @@ int menuGestioneFile(Libro *libri, int numLibri, int capLibri, Utente *utenti, i
             break;
             
             case 2:                   // passiamo il doppio puntatore
-            int flagCaricaDatabase = caricaDatabaseDaFileBinario(libri, numLibri, capLibri, utenti, numUtenti, capUtenti, prestiti, numPrestiti, capPrestiti);
+            int flagCaricaDatabase = caricaDatabaseDaFileBinario(&libri, &numLibri, &capLibri, &utenti, &numUtenti, &capUtenti, &prestiti, &numPrestiti, &capPrestiti);
             if (flagCaricaDatabase == -1) {
                 return -1;
             }
@@ -871,7 +881,7 @@ void top5LibriPiuPrestati(Libro *database_libri, Prestito *database_prestiti, in
 
 
 // === MENU GESTIONE UTENTI ===
-void menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capacita_attuale_utenti){
+Utente* menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capacita_attuale_utenti){
     int scelta;
     do { 
         // Stampa menù gestione utenti
@@ -891,7 +901,7 @@ void menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capa
                 Utente* temp;
                 temp = inserisci_nuovo_utente(database_utenti,utenti_inseriti,capacita_attuale_utenti);
                 if (temp == NULL) {
-                    printf("Errore di allocazione in memoria! Verrai reindirizzato al menù principale\n");
+                    printf("Errore di allocazione in memoria! Verrai reindirizzato al menù gestione utenti\n");
                 } else {
                     database_utenti = temp;
                 }
@@ -917,6 +927,7 @@ void menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capa
             printf("Non ci sono utenti inseriti, dunque non è possibile fare alcuna azione diversa dalla 1! Riprova:\n");
         }
     } while (scelta != 4);
+    return database_utenti;
 }
 
 /*
@@ -1453,7 +1464,7 @@ void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti) {
 }
 
 // === MENU GESTIONE PRESTITI === //
-void menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestito* database_prestiti,int* utenti_inseriti, int* libri_inseriti,int* prestiti_inseriti,int* capacita_attuale_prestiti){
+Prestito* menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestito* database_prestiti,int* utenti_inseriti, int* libri_inseriti,int* prestiti_inseriti,int* capacita_attuale_prestiti){
     int scelta;
     do {        
         // Stampa Menù
@@ -1473,7 +1484,7 @@ void menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestit
                 Prestito* temp;
                 temp = registra_prestito(database_libri,database_utenti,database_prestiti,prestiti_inseriti,capacita_attuale_prestiti,*libri_inseriti,*utenti_inseriti);
                 if (temp == NULL) { // Controllo che l'eventuale riallocazione sia avvenuta con successo
-                    printf("\nErrore di allocazione in memoria! Verrai reindirizzato al menù gestione utenti\n");
+                    printf("\nErrore di allocazione in memoria! Verrai reindirizzato al menù gestione prestiti\n");
                 } else {
                     database_prestiti = temp; // Se è avvenuta con successo, aggiorno tale puntatore.
                 }
@@ -1502,7 +1513,7 @@ void menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestit
             printf("Non sono presenti prestiti. Per questo motivo le uniche scelte ammesse sono 1 e 5. Riprova:\n");
         }
     } while (scelta != 5);
-    return;
+    return database_prestiti;
 }
 
 // Funzione registra prestito
