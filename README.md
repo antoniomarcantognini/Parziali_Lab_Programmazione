@@ -18,9 +18,8 @@ Riga 666: a che serve quella funzione ? ins ?
 
 
 
-RICORDARSI: 
-CONTROLLO Se non ci sono utenti da fare (ANTO)
-
+# RICORDARSI: 
+CONTROLLO Se non ci sono utenti da fare (ANTO) \\
 MENU in "Inserisci il codice dell'utente che stai cercando" (RICK)
 
 NON STAMPA I PRESTITI RESTITUITI (RICK)
