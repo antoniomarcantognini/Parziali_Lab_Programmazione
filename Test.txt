@@ -166,11 +166,43 @@ Output ottenuto: Il codice del prestito è inesistente + menu di scelta
 Esito: 1
 Screen
 
-ID Test: T01
-Funzionalità testata:
-Input fornito:
-Output atteso:
-Output ottenuto:
+ID Test: T23
+Funzionalità testata: Menu gestione libri -> ricerca libro per isbn (libro esistente)
+Input fornito: {3; 111-2-3333-4444-5} (libro esistente)
+Output atteso: Libro trovato + stampa informazioni + ritorno al menu gestione libri
+Output ottenuto: Libro trovato + stampa informazioni + ritorno al menu gestione libri
+Esito: 1
+Screen
+
+ID Test: T24
+Funzionalità testata: Menu gestione libri -> ricerca libro per isbn (libro non esistente)
+Input fornito: {3; 111-1-1111-1111-1} (libro esistente)
+Output atteso: ERRORE: non è stato trovato nessun libro con questo codice ISBN + sottomenu scelta
+Output ottenuto: ERRORE: non è stato trovato nessun libro con questo codice ISBN + sottomenu scelta
+Esito: 1
+Screen
+
+ID Test: T25
+Funzionalità testata: menu gestione prestiti -> creazione prestito con libro disponibile
+Input fornito:{1; 111-2-3333-4444-5; 1; 28/11/2025 } (scelta menu gestione prestiti, codice isbn                   libro, codice utente, e data del prestito)
+Output atteso: Prestito inserito correttamente ! + ritorno al menu gestione prestito
+Output ottenuto: Prestito inserito correttamente ! + ritorno al menu gestione prestito
+Esito: 1
+Screen
+
+ID Test: T26
+Funzionalità testata: menu gestione prestiti -> creazione prestito con libro non disponibile
+Input fornito: {1; 111-1-1111-1111-1} (libro non esistente)
+Output atteso: Non è stato trovato alcun libro con tale codice ! + sotto menu scelta
+Output ottenuto:  Non è stato trovato alcun libro con tale codice ! + sotto menu scelta
+Esito: 1
+Screen
+
+ID Test: T27
+Funzionalità testata: menu gestione prestiti -> registra la restituzione di un libro
+Input fornito:{ 2; 1} codice del prestito
+Output atteso: prestito assegnato correttamente (cioe restituzione del prestito)
+Output ottenuto:prestito assegnato correttamente (cioe restituzione del prestito)
 Esito: 1
 Screen
 
@@ -205,4 +237,3 @@ Output atteso:
 Output ottenuto:
 Esito: 1
 Screen
-
