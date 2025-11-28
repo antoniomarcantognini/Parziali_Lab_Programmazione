@@ -61,3 +61,13 @@ Se usi un puntatore singolo (Libro *libri), il main non verrà mai a sapere che 
 
 Perché nel tuo caso la Soluzione 1 è obbligatoria per menuGestioneFile?
 Perché quella funzione deve modificare TRE array contemporaneamente (libri, utenti, prestiti). In C puoi restituire (return) un solo valore alla volta. Quindi l'unico modo per modificare 3 puntatori è passarli tutti e tre come doppi puntatori (**).
+
+
+# NUOVE COSE DA RICORDARE:
+ANTO: controllare la funzione calcolaDatabaseBinario
+ANTO: richiedere il salvataggio del file quando si esce (OBBLIGATORIO)
+ANTO: Manca la scritta "Libro in assoluto più prestato"
+
+# IDEE: 
+Inserire aggiungi copie
+Inserire richiesta all'avvio di caricamento di file
