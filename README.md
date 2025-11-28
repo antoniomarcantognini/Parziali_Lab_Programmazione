@@ -19,23 +19,15 @@ Riga 666: a che serve quella funzione ? ins ?
 
 
 # RICORDARSI: 
-CONTROLLO Se non ci sono utenti da fare (ANTO) //
-MENU in "Inserisci il codice dell'utente che stai cercando" (RICK)
-
-NON STAMPA I PRESTITI RESTITUITI (RICK)
-
-CONTROLLO Se non ci sono libri da fare (Statistiche e report) (ANTO)
-
-INSERIRE "AGGIUNGI COPIE" (futuro)
-
-Se Libri/Utenti/Prestiti == NULL Nella lettura del database, bisogna uscire                                     da tutto il programma (e fare i vari free) (RICK)
-
-CONTROLLO "return" in funzioni void (ANTO)
-
-Inserire CONTROLLO risposta 'S' e 'N' nella funzione ESCI (ANTO)
-
-Togliere **libri e lasciare *libri (ANTO) discussione per realloc (RICK)
-
+CONTROLLO Se non ci sono utenti da fare (ANTO)  
+MENU in "Inserisci il codice dell'utente che stai cercando" (RICK)  
+NON STAMPA I PRESTITI RESTITUITI (RICK)  
+CONTROLLO Se non ci sono libri da fare (Statistiche e report) (ANTO)  
+INSERIRE "AGGIUNGI COPIE" (futuro)  
+Se Libri/Utenti/Prestiti == NULL Nella lettura del database, bisogna uscire                                     da tutto il programma (e fare i vari free) (RICK)  
+CONTROLLO "return" in funzioni void (ANTO)  
+Inserire CONTROLLO risposta 'S' e 'N' nella funzione ESCI (ANTO)  
+Togliere **libri e lasciare *libri (ANTO) discussione per realloc (RICK)  
 
 controlli chiesti dal professore:
 1. Inserimento libro con ISBN valido
