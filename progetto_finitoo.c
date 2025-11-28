@@ -32,7 +32,7 @@ typedef struct {
 
 // prototipi delle funzioni
 // inserimento libro
-void menuGestioneLibri(Libro *libri, int *ptrNumLibri, int *ptrCapLibri, int numLibri);   // numLibri è il valore del puntatore!!
+void menuGestioneLibri(Libro **libri, int *ptrNumLibri, int *ptrCapLibri);
 
 Libro* inserisciNuovoLibro(Libro *libri, int *ptrNumLibri, int *ptrCapLibri);
 void visualizzaTuttiILibri(Libro *libri, int numLibri);
@@ -179,14 +179,10 @@ do{
     switch (scelta)
     {
         case 'A':
-            // CHIAMATA ALLA FUNZIONE: Qui avviene il cambiamento.
-            // Non passiamo il valore di 'libri' (l'indirizzo che contiene),
-            // ma passiamo L'INDIRIZZO DELLA VARIABILE 'libri' STESSA.
-            // Usiamo l'operatore '&' per ottenere l'indirizzo del puntatore.
-            menuGestioneLibri(libri, ptrNumLibri, ptrCapLibri, *ptrNumLibri);  // passo il valore del puntatore che ho incrementato nella funzione inserisci libro, permetendo alla funzione di modificarla
+            menuGestioneLibri(&libri, ptrNumLibri, ptrCapLibri);
             break;
          case 'B':
-            menuGestioneUtenti(utenti, ptrNumUtenti, ptrCapUtenti); // non passiamo anche qui gli indirizzi & ?
+            menuGestioneUtenti(utenti, ptrNumUtenti, ptrCapUtenti); 
             break;
         case 'C':
             menuGestionePrestiti(utenti, libri, prestiti, ptrNumUtenti, ptrNumLibri, ptrNumPrestiti, ptrCapPrestiti);
@@ -2369,7 +2365,7 @@ void libriDisponibiliPerPrestito(Libro *libri,int numLibri){
 
 
 // === MENU GESTIONE LIBRO === //
-void menuGestioneLibri(Libro *libri, int *ptrNumLibri, int *ptrCapLibri,int numLibri){
+void menuGestioneLibri(Libro **libri, int *ptrNumLibri, int *ptrCapLibri){
     int sceltaGestioneLibri = 0;
     do{
         printf("\n\n--Inserisci la tua scelta--\n\n"); 
@@ -2388,25 +2384,25 @@ void menuGestioneLibri(Libro *libri, int *ptrNumLibri, int *ptrCapLibri,int numL
         {
         case 1:
             Libro* temp;
-            temp = inserisciNuovoLibro(libri, ptrNumLibri, ptrCapLibri); 
+            temp = inserisciNuovoLibro(*libri, ptrNumLibri, ptrCapLibri); 
             if (temp == NULL) {
                 printf("Errore allocazione durante l'inserimento del libro. Memoria non modificata.\n");
                 // menu principale
             } else {
-                libri = temp;
+                *libri = temp;
             }
             break;
         case 2: // passo l'indirizzo di memoria della struct dinamica libri
-            visualizzaTuttiILibri(libri, *ptrNumLibri);
+            visualizzaTuttiILibri(*libri, *ptrNumLibri);
             break;
         case 3:
-            cercaLibroPerISBN(libri,*ptrNumLibri);
+            cercaLibroPerISBN(*libri,*ptrNumLibri);
             break;
         case 4:
-            cercaLibriPerAutore(libri,*ptrNumLibri);
+            cercaLibriPerAutore(*libri,*ptrNumLibri);
             break;
         case 5:
-            libriDisponibiliPerPrestito(libri,*ptrNumLibri);
+            libriDisponibiliPerPrestito(*libri,*ptrNumLibri);
             break;
         case 6:
             return;
