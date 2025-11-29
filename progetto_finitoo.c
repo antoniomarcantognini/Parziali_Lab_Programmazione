@@ -542,27 +542,36 @@ void esci(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *p
     char risposta;
     
     printf("\n=== CHIUSURA PROGRAMMA ===\n");
-    printf("Vuoi salvare le modifiche su file binario prima di uscire? (S/N): ");
-    scanf(" %c", &risposta);
-    risposta = toupper(risposta);
+    
+    do {
+        printf("Vuoi salvare le modifiche su file binario prima di uscire? (S/N): ");
+        scanf(" %c", &risposta);
+        
+        // Convertiamo in maiuscolo per accettare sia 's' che 'S' (o 'n'/'N')
+        risposta = toupper(risposta);
+
+        if (risposta != 'S' && risposta != 'N') {
+            printf("Errore: Inserimento non valido. Digita 'S' per salvare o 'N' per uscire senza salvare.\n");
+        }
+
+    } while (risposta != 'S' && risposta != 'N');
 
     if (risposta == 'S') {
         salvaDatabaseSuFileBinario(libri, numLibri, utenti, numUtenti, prestiti, numPrestiti);
     } else {
-        printf("Chiusura senza salvataggio...\n");
+        printf("Chiusura senza salvataggio delle modifiche...\n");
     }
 
     printf("Liberazione della memoria in corso...\n");
     
-    free(libri);
-    free(utenti);
-    free(prestiti);
-
+    if (libri != NULL) free(libri);
+    if (utenti != NULL) free(utenti);
+    if (prestiti != NULL) free(prestiti);
 
     printf("Memoria liberata correttamente.\n");
     printf("Arrivederci!\n");
     
-    exit(0); // Termina immediatamente l'esecuzione del programma
+    exit(0); 
 }
 
 // === MENU GESTIONE STATISTICHE E REPORT === //
@@ -721,9 +730,9 @@ void visualizzaLibroPiuPrestato(Libro *database_libri, Prestito *database_presti
         
         // Controllo grammaticale: singolare vs plurale
         if (conteggio_risultato == 1) {
-            printf("'%s' (prestato 1 volta)\n", database_libri[indice_risultato].titolo);
+            printf("Il libro più prestato in assoluto è:\t'%s' (prestato 1 volta)\n", database_libri[indice_risultato].titolo);
         } else {
-            printf("'%s' (prestato %d volte)\n", database_libri[indice_risultato].titolo, conteggio_risultato);
+            printf("Il libro più prestato in assoluto è:\t'%s' (prestato %d volte)\n", database_libri[indice_risultato].titolo, conteggio_risultato);
         }
 
     } else { 
@@ -1973,12 +1982,14 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
                 if (scelta == 1) break;
                 if (scelta == 2) return;
                 printf("La tua scelta deve essere 1 oppure 2! Riprova:\n");
+
             } while (1);
         } else {
             for (int i=0;i<utenti_inseriti;i++) {
                 if (database_utenti[i].codice_utente == codice) {
                     flag = 0;
                     printf("\nUtente trovato correttamente!\n");
+                    break;
                 } else {
                     printf("Utente non trovato!\n");
                     printf("Cosa vuoi fare?\n");

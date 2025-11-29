@@ -1,0 +1,7 @@
+=== CATALOGO LIBRI ===
+ISBN: 111-2-3333-4444-5 | Titolo: Titolo 1 | Autore: Autore 1 | Anno: 1901 | Copie: 4 | Genere: Genere 1
+ISBN: 222-3-4444-5555-6 | Titolo: Titolo 2 | Autore: Autore 2 | Anno: 1902 | Copie: 6 | Genere: Genere 2
+ISBN: 333-4-5555-6666-7 | Titolo: Titolo 3 | Autore: Autore 1 | Anno: 1903 | Copie: 6 | Genere: Genere 1
+ISBN: 444-5-6666-7777-8 | Titolo: Titolo 4 | Autore: Autore 2 | Anno: 1904 | Copie: 5 | Genere: Genere 4
+ISBN: 555-6-7777-8888-9 | Titolo: Titolo 5 | Autore: Autore 3 | Anno: 1905 | Copie: 4 | Genere: Genere 5
+ISBN: 666-7-8888-9999-0 | Titolo: Titolo 6 | Autore: Autore 1 | Anno: 1906 | Copie: 8 | Genere: Genere 1
