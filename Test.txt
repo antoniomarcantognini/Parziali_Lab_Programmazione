@@ -206,34 +206,98 @@ Output ottenuto:prestito assegnato correttamente (cioe restituzione del prestito
 Esito: 1
 Screen
 
-ID Test: T01
-Funzionalità testata:
-Input fornito:
-Output atteso:
+ID Test: T28
+Funzionalità testata: menu gestione utenti -> visualizza tutti gli utenti e cerca utente                   per codice nel caso in cui non sono inseriti utenti nel database
+Input fornito: 2  e  3
+Output atteso: Non ci sono utenti inseriti, dunque non è possibile fare alcuna azione             diversa dalla 1! riprova: (x2) + ritorno al menu
+Output ottenuto: Non ci sono utenti inseriti, dunque non è possibile fare alcuna azione           diversa dalla 1! riprova: (x2) + ritorno al menu
+Esito: 1
+Screen
+
+ID Test: T29
+Funzionalità testata: menu gestione prestiti-> registra restituzione di un libro,                 visualizza tutti i prestiti attivi, vidualizza lo storico dei prestiti di un               utente nel caso in cui non sono inseriti prestiti nel database
+        Input fornito: 2, 3, 4
+Output atteso: Non sono presenti prestiti. Per questo motivo le uniche scelte ammesse                     sono 1 e 5. Riprova: (x3) + ritorno al menu
+Output ottenuto: Non sono presenti prestiti. Per questo motivo le uniche scelte ammesse                   sono 1 e 5. Riprova: (x3) + ritorno al menu
+Esito: 1
+Screen
+
+ID Test: T30
+Funzionalità testata: menu gestione statistiche e report -> statistiche generali, libri                   per genere, top 5 libri piu prestati nel caso in cui il database è vuoto
+Input fornito: 1, 2 e 3
+Output atteso: nessun libro /prestito registrato e tutti 0
+Output ottenuto: nessun libro /prestito registrato e tutti 0
+Esito: 1
+Screen
+
+ID Test: T31
+Funzionalità testata: menu gestione statistiche e report in caso di database popolato (statistiche generali e libri per genere)
+Input fornito: vari libri, prestiti e utenti inseriti
+Output atteso: corretta stampa delle statistiche (vedi foto) + ritorno al menu
+Output ottenuto: corretta stampa delle statistiche (vedi foto) + ritorno al menu
+Esito: 1
+Screen
+
+ID Test: T32
+Funzionalità testata: menu gestione statistiche e report in caso di database popolato (top5 Libri piu prestati)
+Input fornito: vari libri, prestiti e utenti inseriti
+Output atteso: corretta stampa delle statistiche (vedi foto) + ritorno al menu
+Output ottenuto: corretta stampa delle statistiche (vedi foto) + ritorno al menu
+Esito: 1
+Screen
+
+ID Test: T33
+Funzionalità testata: menu Gestione file-> salvataggio database su file binario
+Input fornito: 1
+Output atteso: Avvio e corretta operazione di salvataggio dati conclusa
+Output ottenuto: Avvio e corretta operazione di salvataggio dati conclusa
+Esito: 1
+Screen
+
+ID Test: T34
+Funzionalità testata: menu Gestione file -> esporta catalogo in formato di testo
+Input fornito: 3
+Output atteso:  catalogo esportato con successo in 'catalogo.txt' + copia file
+Output ottenuto: catalogo esportato con successo in 'catalogo.txt' + copia file
+Esito: 1
+Screen
+
+ID Test: T35
+Funzionalità testata: menu gestione file -> caricamento database da file binario
+Input fornito: 2
+Output atteso: operazione di caricamento completata
+Output ottenuto: operazione di caricamento completata
+Esito: 1
+Screen
+
+ID Test: T36
+Funzionalità testata: gestione array libri con riallocazione (6 libri) capacita iniziale 5
+Input fornito: inserimento 6 libri
+Output atteso: vedi screen
 Output ottenuto:
 Esito: 1
 Screen
 
-ID Test: T01
-Funzionalità testata:
-Input fornito:
-Output atteso:
+ID Test: T37
+Funzionalità testata: gestione array utenti con riallocazione (6 libri) capacita iniziale 5
+Input fornito: inserimento 6 utenti
+Output atteso:  vedi screen
 Output ottenuto:
 Esito: 1
 Screen
 
-ID Test: T01
-Funzionalità testata:
-Input fornito:
-Output atteso:
-Output ottenuto:
+ID Test: T38
+Funzionalità testata: menu gestione file -> esporta report prestiti in formato testo
+Input fornito: inserimento prestiti
+Output atteso: report esportato con successo in report_prestiti.txt + file
+Output ottenuto: report esportato con successo in report_prestiti.txt + file
 Esito: 1
 Screen
 
-ID Test: T01
-Funzionalità testata:
-Input fornito:
-Output atteso:
+ID Test: T39
+Funzionalità testata: chiusura programma e liberazione memoria
+Input fornito: esci
+Output atteso: vedi screen
 Output ottenuto:
 Esito: 1
 Screen
