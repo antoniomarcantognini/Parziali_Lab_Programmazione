@@ -138,4 +138,5 @@ int main(){
                 printf("Errore, inserisci un carattere corretto! \n");
             break;
         }
-    }while(flagUscita == 0);
+    }while(scelta != 'F');
+    
