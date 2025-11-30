@@ -2221,9 +2221,9 @@ void cercaLibroPerISBN(Libro *libri,int numLibri){
     }
 
     char isbnInserito[18];
-    int srcFlag;
+    int indiceTrovato;
     do{
-        srcFlag = -1;
+        indiceTrovato = -1;
         // inserimento codice ISBN
         printf("Inserisci codice ISBN (formato XXX-X-XXXX-XXXX-X): \n");
         scanf("%17s", isbnInserito);
@@ -2233,38 +2233,34 @@ void cercaLibroPerISBN(Libro *libri,int numLibri){
         else{
             // ricerca isbn inserito:
             for(int i = 0; i < numLibri; i++){
-                if(!strcmp(isbnInserito,libri[i].codice_ISBN)){
-                    srcFlag = i;
-                    break;
+                if(strcmp(isbnInserito,libri[i].codice_ISBN) == 0){
+                    indiceTrovato = i;
+                    break;  // trovato, interrompo il ciclo for
                 }
             }
         
-            if(srcFlag == -1){
-                printf("\nERRORE: Non è stato trovato nessun libro con questo codice ISBN.\n");
+            if (indiceTrovato != -1) {
+                // Libro trovato
+                printf("\n=== LIBRO TROVATO ===\n");
+                printf("Codice ISBN:                %s\n", libri[indiceTrovato].codice_ISBN);
+                printf("Titolo:                     %s\n", libri[indiceTrovato].titolo);
+                printf("Autore:                     %s\n", libri[indiceTrovato].autore);
+                printf("Anno di pubblicazione:      %d\n", libri[indiceTrovato].anno_pubblicazione);
+                printf("Numero di copie:            %d\n", libri[indiceTrovato].numero_copie);
+                printf("Genere:                     %s\n", libri[indiceTrovato].genere);
+                return;
+            } else {
+                printf("\nERRORE: Nessun libro trovato con questo codice ISBN.\n");
             }
         }
-
-        // Controllo errore: Se il formato è invalido OPPURE il libro non è stato trovato
-        if(invalida_ISBN(isbnInserito) || srcFlag == -1){
-            
-            int exit_flag = menu_errore_inserimento_ISBN(); 
-
-            // Se la funzione ritorna -1 (exit flag), esco dalla ricerca
-            if (exit_flag == -1) {
-                return; 
-            }
+        // Se arriviamo qui, o il formato era sbagliato o il libro non c'era.
+        int scelta = menu_errore_inserimento_ISBN();
+        if (scelta == -1) {
+            printf("\nRicerca annullata.\n");
+            return; // L'utente ha scelto di uscire
         }
-
-    } while(invalida_ISBN(isbnInserito) || srcFlag == -1);
-
-    // Se arrivo qui, il libro è stato trovato (srcFlag != -1)
-    printf("\n=== LIBRO TROVATO ===\n");
-    printf("Codice ISBN:                %s\n", libri[srcFlag].codice_ISBN);
-    printf("Titolo:                     %s\n", libri[srcFlag].titolo);
-    printf("Autore:                     %s\n", libri[srcFlag].autore);
-    printf("Anno di pubblicazione:      %d\n", libri[srcFlag].anno_pubblicazione);
-    printf("Numero di copie:            %d\n", libri[srcFlag].numero_copie);
-    printf("Genere:                     %s\n", libri[srcFlag].genere);
+        // Se scelta è 0, il ciclo do-while ricomincia
+    } while (1); // Il ciclo è controllato dai return interni
 }
 
 
