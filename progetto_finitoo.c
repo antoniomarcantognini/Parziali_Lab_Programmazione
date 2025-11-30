@@ -192,16 +192,18 @@ int main(){
                 utente_temp = menuGestioneUtenti(utenti, ptrNumUtenti, ptrCapUtenti);
                 if (utente_temp == NULL) {
                     flagUscita = 1;  // uscita di emergenza
-                } 
-                utenti = utente_temp;
+                } else{
+                    utenti = utente_temp;
+                }
                 break;
             case 'C':
                 Prestito* prestito_temp; 
                 prestito_temp = menuGestionePrestiti(utenti, libri, prestiti, ptrNumUtenti, ptrNumLibri, ptrNumPrestiti, ptrCapPrestiti);
                 if (prestito_temp == NULL) {
                     flagUscita = 1;  // uscita di emergenza
+                } else{
+                    prestiti = prestito_temp;
                 }
-                prestiti = prestito_temp;
                 break;
             case 'D':
                 menuGestioneStatisticheReport(libri, utenti, prestiti, *ptrNumLibri, *ptrNumUtenti, *ptrNumPrestiti);  // qui ho aggiunto *
