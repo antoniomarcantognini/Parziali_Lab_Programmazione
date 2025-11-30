@@ -1447,7 +1447,7 @@ void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti) {
                     printf("\nLa tua scelta: ");
                     break;
                 }
-            } while (1);
+            } while (scelta != 1);
         } else { // Se l'utente viene trovato, vengono stampati i suoi dati.
             printf("Utente trovato!\n");
             printf("  Nome: %s\n",database_utenti[src_flag].nome);
@@ -1867,17 +1867,21 @@ void registra_restituzione(Prestito* database_prestiti,Libro* database_libri, in
     // Controllo esistenza codice, assegnazjone restituito e aumento numero di copie.
     for (int i=0;i<prestiti_inseriti;i++) {
         if (codice == database_prestiti[i].codice_prestito) {   
-            database_prestiti[i].restituito=1;
-            for (int j=0;j<libri_inseriti;j++) {
-                if (strcmp(database_libri[j].codice_ISBN,database_prestiti[i].codice_ISBN_libro)==0) {
-                    database_libri[j].numero_copie++;
-                    break;
+            if(database_prestiti[i].restituito == 0) {
+                database_prestiti[i].restituito=1;
+                printf("Restituzione assegnata correttamente!");
+                for (int j=0;j<libri_inseriti;j++) {
+                    if (strcmp(database_libri[j].codice_ISBN,database_prestiti[i].codice_ISBN_libro)==0) {
+                        database_libri[j].numero_copie++;
+                        break;
+                    }
                 }
+            } else {
+                printf("Restituzione già assegnata.");
             }
             break;
         }
     }
-    printf("Prestito assegnato correttamente!");
     return;
 }
 
@@ -1900,7 +1904,7 @@ int menu_codice_prestito_errato() {
             return 1;
 
         default:
-            printf("\nLa scdlta deve esserd 1 oppure 2! Riprova:\n");
+            printf("\nLa scelta deve esserd 1 oppure 2! Riprova:\n");
             break;
         }
     } while (1);
@@ -1975,7 +1979,7 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
         } else {
             for (int i=0;i<utenti_inseriti;i++) {
                 if (database_utenti[i].codice_utente == codice) {
-                    flag = 0;
+                    flag = i;
                     printf("\nUtente trovato correttamente!\n");
                     break;
                 }
@@ -2009,30 +2013,40 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
         return;
     }
 
+    posizioni_restituiti[0]=-1;
     // Ciclo per scrittura prestiti non restituiti
-    printf("\nPrestiti non restituiti:\n");
     for (int i=0;i<prestiti_inseriti;i++) {
         if (database_prestiti[i].codice_utente == codice) {
             if (database_prestiti[i].restituito == 0) {
-                stampa_prestito(database_prestiti,i,++indice_prestito_non_restituito);
-            }
-        } else {
-            if (capacita_posizioni_restituiti<=++indice_prestito_restituito) { // Eventuale riallocazione dinamica di posizioni_restituiti
-                posizioni_restituiti = realloc(posizioni_restituiti,2*capacita_posizioni_restituiti*sizeof(int));
-                if (posizioni_restituiti==NULL) {
-                    printf("\nErrore di allocazione in memoria! Verrai reindirizzato al menù gestione prestiti.\n");
-                    return;
+                if (++indice_prestito_non_restituito == 0) {
+                    printf("\nPrestiti non restituiti:\n");
                 }
-                capacita_posizioni_restituiti = 2*capacita_posizioni_restituiti;
+                stampa_prestito(database_prestiti,i,indice_prestito_non_restituito);
+            } else {
+                if (capacita_posizioni_restituiti<=++indice_prestito_restituito) { // Eventuale riallocazione dinamica di posizioni_restituiti
+                    posizioni_restituiti = realloc(posizioni_restituiti,2*capacita_posizioni_restituiti*sizeof(int));
+                    if (posizioni_restituiti==NULL) {
+                        printf("\nErrore di allocazione in memoria! Verrai reindirizzato al menù gestione prestiti.\n");
+                        return;
+                    }
+                    capacita_posizioni_restituiti = 2*capacita_posizioni_restituiti;
+                }
+                posizioni_restituiti[indice_prestito_restituito]=i;
             }
-            posizioni_restituiti[indice_prestito_restituito]=i;
         }
+    }
+    if (indice_prestito_non_restituito == -1) {
+        printf("\nNon ci sono prestiti attivi per questo utente.\n");
     }
 
     // Stampa dei restituiti
-    printf("\nPrestiti restituiti:\n");
-    for (int i=0;i<=indice_prestito_restituito;i++) {
-        stampa_prestito(database_prestiti,posizioni_restituiti[i],i);
+    if (posizioni_restituiti[0]!=-1) {
+        printf("\nPrestiti restituiti:\n");
+        for (int i=0;i<=indice_prestito_restituito;i++) {
+            stampa_prestito(database_prestiti,posizioni_restituiti[i],i);
+        }
+    } else {
+        printf("\nNon ci sono prestiti restituiti.\n");
     }
 
     free(posizioni_restituiti);
@@ -2071,7 +2085,6 @@ int menu_errore_inserimento_ISBN() {
     } while (1);
     return 0;
 }
-
 // Funzione inserisciNuovoLibro
 Libro* inserisciNuovoLibro(Libro *libri,int *ptrNumLibri,int* ptrCapLibri){
     
@@ -2244,12 +2257,12 @@ void cercaLibroPerISBN(Libro *libri,int numLibri){
 
     // Se arrivo qui, il libro è stato trovato (srcFlag != -1)
     printf("\n=== LIBRO TROVATO ===\n");
-    printf("Codice ISBN:         %s\n", libri[srcFlag].codice_ISBN);
-    printf("Titolo:              %s\n", libri[srcFlag].titolo);
-    printf("Autore:              %s\n", libri[srcFlag].autore);
-    printf("Anno di pubblicazione: %d\n", libri[srcFlag].anno_pubblicazione);
-    printf("Numero di copie:     %d\n", libri[srcFlag].numero_copie);
-    printf("Genere:              %s\n", libri[srcFlag].genere);
+    printf("Codice ISBN:                %s\n", libri[srcFlag].codice_ISBN);
+    printf("Titolo:                     %s\n", libri[srcFlag].titolo);
+    printf("Autore:                     %s\n", libri[srcFlag].autore);
+    printf("Anno di pubblicazione:      %d\n", libri[srcFlag].anno_pubblicazione);
+    printf("Numero di copie:            %d\n", libri[srcFlag].numero_copie);
+    printf("Genere:                     %s\n", libri[srcFlag].genere);
 }
 
 
