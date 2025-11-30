@@ -30,10 +30,9 @@ typedef struct {
 } Prestito;
 
 
-// prototipi delle funzioni
-// inserimento libro
+// Prototipi delle funzioni
+// Funzioni menu gestione libri
 void menuGestioneLibri(Libro **libri, int *ptrNumLibri, int *ptrCapLibri);
-
 Libro* inserisciNuovoLibro(Libro *libri, int *ptrNumLibri, int *ptrCapLibri);
 void visualizzaTuttiILibri(Libro *libri, int numLibri);
 void cercaLibroPerISBN(Libro *libri,int numLibri);
@@ -41,11 +40,13 @@ int formatoCorrettoISBN(char *s);
 void cercaLibriPerAutore(Libro *libri,int numLibri);
 void libriDisponibiliPerPrestito(Libro *libri,int numLibri);
 int menu_errore_inserimento_ISBN();
+
+
+// Funzioni menu gestione prestiti
 // Registrazione prestiti
 Prestito* menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestito* database_prestiti,int* utenti_inseriti, int* libri_inseriti,int* prestiti_inseriti,int* capacita_attuale_prestiti);
-
 Prestito* registra_prestito(Libro* database_libri,Utente* database_utenti,Prestito* database_prestiti,int* prestiti_inseriti,int* capacita_attuale_prestiti,int libri_inseriti,int utenti_inseriti);
-void richiedi_libro_utente(Libro* database_libri,Utente* database_utenti,int* utenti_inseriti,int libri_inseriti,int*posizione_utente,int* posizione_libro);    
+void richiedi_libro_utente(Libro* database_libri,Utente* database_utenti,int* utenti_inseriti,int libri_inseriti,int*posizione_utente,int* posizione_libro);
 
 // Richiesta libro
 int richiesta_codice_ISBN(Libro* database_libri,int libri_inseriti,char ISBN[],int* posizione_libro);
@@ -53,10 +54,12 @@ int invalida_ISBN(char ISBN[18]);
 int invalida_data(char data[11]);
 void controlla_esistenza_libro(Libro* database_libri,int libri_inseriti,char ISBN[],int* posizione_libro);
 int menu_codice_ISBN_non_valido();
+
 // Richiesta utente
 void richiesta_codice_utente(Utente* database_utenti, int utenti_inseriti, int* codice, int* posizione_utente);
 void controlla_esistenza_utente(Utente* database_utenti,int utenti_inseriti,int codice,int* posizione_utente);
 int menu_codice_utente_non_valido();
+
 // Calcolo data di restituzione
 void calcola_30_giorni_dopo(char data[]);
 void estrapola_data_numerica(char data[],int* anno, int* mese, int* giorno);
@@ -75,6 +78,8 @@ void visualizza_prestiti_attivi(Utente* database_utenti,Prestito* database_prest
 void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* database_prestiti,int utenti_inseriti,int prestiti_inseriti);
 void stampa_prestito(Prestito* database_prestiti,int indice_prestito_assoluto,int indice_prestito_nel_ciclo_specifico);
 
+
+// Funzioni menu gestione utenti
 // Prototipi per inserimento utente
 Utente* inserisci_nuovo_utente(Utente* database_utenti,int* utenti_inseriti,int* capacita_utenti_attuale);
 int inserimento_dati_utenti(Utente* database_utenti,int* utenti_inseriti);
@@ -97,7 +102,8 @@ void stampa_dati_utenti(Utente* database_utenti, int utenti_inseriti, int* indic
 // Prototipi per ricerca utente
 void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti);
 
-// Prototipi menu statistiche e report:
+
+// Funzioni menu gestione statistiche e report
 void menuGestioneStatisticheReport(Libro *database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti); 
 void statisticheGenerali(Libro *database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti);
 int calcolaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti, int *out_indice_libro, int *out_conteggio);
@@ -105,23 +111,22 @@ void visualizzaLibroPiuPrestato(Libro *database_libri, Prestito *database_presti
 void libriPerGenere(Libro* database_libri, int libri_inseriti);
 void top5LibriPiuPrestati(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti);
 
-// Prototipi menu salvataggio su file
+
+// Funzioni menu gestione file
 int menuGestioneFile(Libro *libri, int numLibri, int capLibri, Utente *utenti, int numUtenti, int capUtenti, Prestito *prestiti, int numPrestiti, int capPrestiti);
 void salvaDatabaseSuFileBinario(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti);
-// Prototipi futuri
 int caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Utente **utenti, int *numUtenti, int *capUtenti, Prestito **prestiti, int *numPrestiti, int *capPrestiti);  // cap... è la capacità attuale
 void esportaCatalogoInFormatoTesto(Libro *libri, int numLibri);
 void esportaReportPrestitiInFormatoTesto(Prestito *prestiti, int numPrestiti, Libro *libri, int numLibri, Utente *utenti, int numUtenti);
-void esci(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti);
+void chiediSalvataggio(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti);
 
 int main(){
-// funzione menu principale:
-// dichiaro le variabili fuori dal do-while
     Libro *libri;
     Utente *utenti;
     Prestito *prestiti;
-        
-    int capacitaMaxLibri = 5;   // parto da 5 e poi la raddoppio nel realloc
+    
+    // Inizializzazione delle variabili capacità massime a 5, poi duplicate dentro le funzioni con il realloc
+    int capacitaMaxLibri = 5;
     int* ptrCapLibri = &capacitaMaxLibri;
         
     int capacitaMaxUtenti = 5;
@@ -129,9 +134,8 @@ int main(){
     int capacitaMaxPrestiti = 5;
     int* ptrCapPrestiti = &capacitaMaxPrestiti;
     char scelta;
-    // int sceltaGestioneLibri = 0;
         
-    int numLibri = 0;  // variabile che tiene conto del numero di libri inserito(nella funzione inserisci libro viene)
+    int numLibri = 0;
     int* ptrNumLibri = &numLibri;
 
     int numUtenti = 0;
@@ -140,12 +144,14 @@ int main(){
     int numPrestiti = 0;
     int* ptrNumPrestiti = &numPrestiti;
 
+    int flagUscita = 0;   // 0 continua, 1 esci
+
     
-    // inizializzazione con malloc 
+    // Inizializzazione dinamica con malloc 
     libri = (Libro*)malloc(capacitaMaxLibri*sizeof(Libro));
     if (libri == NULL) {
         printf("Errore critico nell'allocazione della memoria per i libri!\n");
-        return 1;  // esci, la memoria non puo essere allocata
+        return 1;
     }
     utenti = (Utente*)malloc(capacitaMaxUtenti*sizeof(Utente));
     if (utenti == NULL) {
@@ -162,72 +168,64 @@ int main(){
     }
     printf("Database inizializzato correttamente ! \n\n");
 
-do{
-    printf("=== GESTIONE BIBLIOTECA DIGITALE ===\n\n");
-    printf("Inserisci la tua scelta: \n\n");
+    do{
+        printf("\n\n=== GESTIONE BIBLIOTECA DIGITALE ===\n\n");
+        printf("Inserisci la tua scelta: \n\n");
         
-    printf("A. GESTIONE LIBRI\n");
-    printf("B. GESTIONE UTENTI\n");
-    printf("C. GESTIONE PRESTITI\n");
-    printf("D. STATISTICHE E REPORT\n");
-    printf("E. GESTIONE FILE \n");
-    printf("F. ESCI \n");
+        printf("A. GESTIONE LIBRI\n");
+        printf("B. GESTIONE UTENTI\n");
+        printf("C. GESTIONE PRESTITI\n");
+        printf("D. STATISTICHE E REPORT\n");
+        printf("E. GESTIONE FILE \n");
+        printf("F. ESCI \n");
 
-    scanf(" %c",&scelta);
-    scelta = toupper(scelta); // Rende la scelta non case-sensitive (A o a)
+        scanf(" %c",&scelta);
+        scelta = toupper(scelta);
 
-    switch (scelta)
-    {
-        case 'A':
-            menuGestioneLibri(&libri, ptrNumLibri, ptrCapLibri);
-            break;
-         case 'B':
-            Utente* utente_temp;
-            utente_temp = menuGestioneUtenti(utenti, ptrNumUtenti, ptrCapUtenti);
-            if (utente_temp == NULL) {
-                return 1;
-            } 
-            utenti = utente_temp;
-            break;
-        case 'C':
-            Prestito* prestito_temp; 
-            prestito_temp = menuGestionePrestiti(utenti, libri, prestiti, ptrNumUtenti, ptrNumLibri, ptrNumPrestiti, ptrCapPrestiti);
-            if (prestito_temp == NULL) {
-                return 1;
-            }
-            prestiti = prestito_temp;
-            break;
-        case 'D':
-            menuGestioneStatisticheReport(libri, utenti, prestiti, *ptrNumLibri, *ptrNumUtenti, *ptrNumPrestiti);  // qui ho aggiunto *
-            break;
-        case 'E':
-            int flagGestioneFile = menuGestioneFile(libri, *ptrNumLibri, *ptrCapLibri, utenti, *ptrNumUtenti, *ptrCapUtenti, prestiti, *ptrNumPrestiti, *ptrCapPrestiti);
-            if (flagGestioneFile == -1) { // Libero la memoria evitando la variabile che ha dato errore
-                if (libri == NULL) {
-                    free(prestiti);
-                    free(utenti);
-                } else {
-                    free(libri);
-                    if (prestiti == NULL) {
-                        free(utenti);
-                    } else {
-                        free(prestiti);
-                    }
+        switch (scelta)
+        {
+            case 'A':
+                menuGestioneLibri(&libri, ptrNumLibri, ptrCapLibri);
+                break;
+            case 'B':
+                Utente* utente_temp;
+                utente_temp = menuGestioneUtenti(utenti, ptrNumUtenti, ptrCapUtenti);
+                if (utente_temp == NULL) {
+                    flagUscita = 1;  // uscita di emergenza
+                } 
+                utenti = utente_temp;
+                break;
+            case 'C':
+                Prestito* prestito_temp; 
+                prestito_temp = menuGestionePrestiti(utenti, libri, prestiti, ptrNumUtenti, ptrNumLibri, ptrNumPrestiti, ptrCapPrestiti);
+                if (prestito_temp == NULL) {
+                    flagUscita = 1;  // uscita di emergenza
                 }
-                return 1;
-            }
-            break;
-        case 'F':
-            break;
-        default: 
-            printf("Errore, inserisci un carattere corretto! \n");
+                prestiti = prestito_temp;
+                break;
+            case 'D':
+                menuGestioneStatisticheReport(libri, utenti, prestiti, *ptrNumLibri, *ptrNumUtenti, *ptrNumPrestiti);  // qui ho aggiunto *
+                break;
+            case 'E':
+                int flagGestioneFile = menuGestioneFile(libri, *ptrNumLibri, *ptrCapLibri, utenti, *ptrNumUtenti, *ptrCapUtenti, prestiti, *ptrNumPrestiti, *ptrCapPrestiti);
+                if (flagGestioneFile == -1) { // Libero la memoria evitando la variabile che ha dato errore
+                    flagUscita = 1;
+                }
+                break;
+            case 'F': // l'utente ha scelto "Esci" dal menu principale
+                chiediSalvataggio(libri, *ptrNumLibri, utenti, *ptrNumUtenti, prestiti, *ptrNumPrestiti);
+                flagUscita = 1;
+                break;
+            default: 
+                printf("Errore, inserisci un carattere corretto! \n");
             break;
         }
-}while(scelta != 'F');
-free(libri);
-free(utenti);
-free(prestiti);
-return 0;
+    }while(flagUscita == 0);
+
+    free(libri);
+    free(utenti);
+    free(prestiti);
+    return 0;
 }
 
 // === MENU GESTIONE FILE === //
@@ -246,11 +244,11 @@ int menuGestioneFile(Libro *libri, int numLibri, int capLibri, Utente *utenti, i
         
         switch(scelta)
         {
-            case 1:                   // passiamo singolo puntatore: dereferenziamo
+            case 1:
             salvaDatabaseSuFileBinario(libri, numLibri, utenti, numUtenti, prestiti, numPrestiti);  
             break;
             
-            case 2:                   // passiamo il doppio puntatore
+            case 2:
             int flagCaricaDatabase = caricaDatabaseDaFileBinario(&libri, &numLibri, &capLibri, &utenti, &numUtenti, &capUtenti, &prestiti, &numPrestiti, &capPrestiti);
             if (flagCaricaDatabase == -1) {
                 return -1;
@@ -269,8 +267,8 @@ int menuGestioneFile(Libro *libri, int numLibri, int capLibri, Utente *utenti, i
             break;
 
             case 6:
-            esci(libri, numLibri, utenti, numUtenti, prestiti, numPrestiti);
-            break;
+            chiediSalvataggio(libri, numLibri, utenti, numUtenti, prestiti, numPrestiti);
+            return -1;  // segnale di uscita dal programma
 
             default:
                 printf("Errore nell'inserimento della scelta! Deve essere 1, 2, 3 o 4\n");
@@ -358,32 +356,28 @@ int caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Ute
         fread(&tempNum, sizeof(int), 1, fp);
 
         if (tempNum >= 0) {
-            // Libero la memoria vecchia per evitare leak
-            free(*libri);
-
-            // Calcolo nuova capacità (almeno tempNum, ma minimo 5 per evitare errori su 0)
+            // nuova capacità, massimo fra tempNum e 5
             int nuovaCapacita = (tempNum > 5) ? tempNum : 5;
             
             // Alloco la nuova memoria
-            *libri = (Libro*)malloc(nuovaCapacita * sizeof(Libro));
+            Libro *tempLibri= (Libro*)malloc(nuovaCapacita * sizeof(Libro));
 
-            if (*libri == NULL) {
+            if (tempLibri == NULL) {
                 printf("Errore critico di allocazione memoria per i libri!\n");
-                printf("Il programma verrà chiuso");
+                printf("Dati precedenti mantenuti.\n"); // perche non tocco *libri
                 return -1;
             } else {
                 // Leggo l'array intero
-                int letti = fread(*libri, sizeof(Libro), tempNum, fp);
-                if (letti == tempNum) {
-                    *numLibri = tempNum;
-                    *capLibri = nuovaCapacita;
-                    printf("[OK] Caricati %d libri.\n", tempNum);
-                } else {
-                    printf("[Errore] Lettura file libri incompleta.\n");
-                }
+                fread(tempLibri, sizeof(Libro), tempNum, fp);
+                // Scambio i puntatori
+                free(*libri);      // Ora posso liberare il vecchio sicuro
+                *libri = tempLibri;  // Assegno il nuovo
+                *numLibri = tempNum;
+                *capLibri = nuovaCapacita;
+                printf("[OK] Caricati %d libri.\n", tempNum);
             }
         }
-        fclose(fp);
+            fclose(fp);
     }
 
     // --- CARICAMENTO UTENTI ---
@@ -393,22 +387,25 @@ int caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Ute
     } else {
         fread(&tempNum, sizeof(int), 1, fp);
         if (tempNum >= 0) {
-            free(*utenti); // Pulisco vecchio
             int nuovaCapacita = (tempNum > 5) ? tempNum : 5;
-            *utenti = (Utente*)malloc(nuovaCapacita * sizeof(Utente));
+            Utente *tempUtenti = (Utente*)malloc(nuovaCapacita * sizeof(Utente));
 
-            if (*utenti == NULL) {
+            if (tempUtenti == NULL) {
                 printf("Errore critico di allocazione memoria per gli utenti!\n");
-                printf("Il programma verrà chiuso");
+                printf("Dati precedenti mantenuti.\n");
                 return -1;
             } else {
-                int letti = fread(*utenti, sizeof(Utente), tempNum, fp);
+                int letti = fread(tempUtenti, sizeof(Utente), tempNum, fp);
                 if (letti == tempNum) {
+                    free(*utenti);        // Libero il vecchio array
+                    *utenti = tempUtenti; // Assegno il nuovo array
                     *numUtenti = tempNum;
                     *capUtenti = nuovaCapacita;
                     printf("[OK] Caricati %d utenti.\n", tempNum);
                 } else {
-                    printf("[Errore] Lettura file utenti incompleta.\n");
+                    // Errore lettura: Pulisco il temporaneo e non tocco i dati precedenti
+                    printf("[Errore] Lettura file utenti incompleta o corrotta. Dati precedenti mantenuti.\n");
+                    free(tempUtenti); 
                 }
             }
         }
@@ -422,27 +419,31 @@ int caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Ute
     } else {
         fread(&tempNum, sizeof(int), 1, fp);
         if (tempNum >= 0) {
-            free(*prestiti); // Pulisco vecchio
             int nuovaCapacita = (tempNum > 5) ? tempNum : 5;
-            *prestiti = (Prestito*)malloc(nuovaCapacita * sizeof(Prestito));
+            Prestito *tempPrestiti = (Prestito*)malloc(nuovaCapacita * sizeof(Prestito));
 
-            if (*prestiti == NULL) {
+            if (tempPrestiti == NULL) {
                 printf("Errore critico di allocazione memoria per i prestiti!\n");
-                printf("Il programma verrà chiuso");
+                printf("Dati precedenti mantenuti.\n");
                 return -1;
             } else {
-                int letti = fread(*prestiti, sizeof(Prestito), tempNum, fp);
+                int letti = fread(tempPrestiti, sizeof(Prestito), tempNum, fp);
                 if (letti == tempNum) {
+                    free(*prestiti);          // Libero il vecchio array
+                    *prestiti = tempPrestiti; // Assegno il nuovo array
                     *numPrestiti = tempNum;
                     *capPrestiti = nuovaCapacita;
                     printf("[OK] Caricati %d prestiti.\n", tempNum);
                 } else {
-                    printf("[Errore] Lettura file prestiti incompleta.\n");
+                    // Errore lettura, sono mantenuti i dati precedenti
+                    printf("[Errore] Lettura file prestiti incompleta o corrotta. Dati precedenti mantenuti.\n");
+                    free(tempPrestiti);
                 }
             }
         }
         fclose(fp);
     }
+    
     printf("Operazione di caricamento completata.\n");
     return 0;
 }
@@ -537,8 +538,8 @@ void esportaReportPrestitiInFormatoTesto(Prestito *prestiti, int numPrestiti, Li
     printf("\nReport esportato con successo in 'report_prestiti.txt' (%d prestiti attivi).\n", prestitiAttiviTrovati);
 }
 
-// Funzione esci
-void esci(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti) {
+// Funzione chiedi salvataggio in uscita, poi richiama il main che libera la memoria e chiude il database
+void chiediSalvataggio(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti) {
     char risposta;
     
     printf("\n=== CHIUSURA PROGRAMMA ===\n");
@@ -547,7 +548,6 @@ void esci(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *p
         printf("Vuoi salvare le modifiche su file binario prima di uscire? (S/N): ");
         scanf(" %c", &risposta);
         
-        // Convertiamo in maiuscolo per accettare sia 's' che 'S' (o 'n'/'N')
         risposta = toupper(risposta);
 
         if (risposta != 'S' && risposta != 'N') {
@@ -559,19 +559,8 @@ void esci(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *p
     if (risposta == 'S') {
         salvaDatabaseSuFileBinario(libri, numLibri, utenti, numUtenti, prestiti, numPrestiti);
     } else {
-        printf("Chiusura senza salvataggio delle modifiche...\n");
+        printf("Uscita senza salvataggio...\n");
     }
-
-    printf("Liberazione della memoria in corso...\n");
-    
-    if (libri != NULL) free(libri);
-    if (utenti != NULL) free(utenti);
-    if (prestiti != NULL) free(prestiti);
-
-    printf("Memoria liberata correttamente.\n");
-    printf("Arrivederci!\n");
-    
-    exit(0); 
 }
 
 // === MENU GESTIONE STATISTICHE E REPORT === //
