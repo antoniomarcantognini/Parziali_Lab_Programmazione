@@ -1,12 +1,9 @@
-# Parziali_Lab_Programmazione
-Reopsitory con i progetti per l'esame di laboratorio di programmazione, update
-IMPORTANTE PER RICCARDO  (DOBBIAMO DISCUTERNE):
-
 # RICORDARSI: 
 MENU in "Inserisci il codice dell'utente che stai cercando" (RICK)  
 NON STAMPA I PRESTITI RESTITUITI (RICK)  
 INSERIRE "AGGIUNGI COPIE" (futuro)  
 Se Libri/Utenti/Prestiti == NULL Nella lettura del database, bisogna uscire                                     da tutto il programma (e fare i vari free) (RICK)   
+Controllare bug visualizzazione utenti (RICK)
 
 # PARTE DELLA DISCUSSIONE CON LE CHIAMATE DEI DOPPI PUNTATORI
 Riassunto delle modifiche essenziali
