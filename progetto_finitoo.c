@@ -1971,7 +1971,6 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
                 if (scelta == 1) break;
                 if (scelta == 2) return;
                 printf("La tua scelta deve essere 1 oppure 2! Riprova:\n");
-
             } while (1);
         } else {
             for (int i=0;i<utenti_inseriti;i++) {
@@ -1979,22 +1978,23 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
                     flag = 0;
                     printf("\nUtente trovato correttamente!\n");
                     break;
-                } else {
-                    printf("Utente non trovato!\n");
-                    printf("Cosa vuoi fare?\n");
-                    printf("\n  1. Inserire un altro nome dell'autore da cercare;\n");
-                    printf("  2. Tornare al menù gestione libri.\n");
-                    printf("\nLa tua scelta: ");
-        
-                    do{ // ciclo per la scelta dell'utente
-                        scanf("%d",&scelta);
-                        if (scelta == 1) break;
-                        if (scelta == 2) return;
-                        printf("La tua scelta deve essere 1 oppure 2! Riprova:\n");
-                    } while (1);
                 }
             }
-        } 
+            if (flag == -1) {
+                printf("Utente non trovato!\n");
+                printf("Cosa vuoi fare?\n");
+                printf("\n  1. Inserire un altro nome dell'autore da cercare;\n");
+                printf("  2. Tornare al menù gestione libri.\n");
+                printf("\nLa tua scelta: ");
+    
+                do{ // ciclo per la scelta dell'utente
+                    scanf("%d",&scelta);
+                    if (scelta == 1) break;
+                    if (scelta == 2) return;
+                    printf("La tua scelta deve essere 1 oppure 2! Riprova:\n");
+                } while (1);
+            }
+        }
     } while (flag == -1);
     
     // Stampo i prestiti non restituiti, salvo le posizioni di quelli restituiti  
