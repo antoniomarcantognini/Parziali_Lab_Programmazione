@@ -31,18 +31,57 @@ typedef struct {
 
 
 // Prototipi delle funzioni
-// Funzioni menu gestione libri
-void menuGestioneLibri(Libro **libri, int *ptrNumLibri, int *ptrCapLibri);
-Libro* inserisciNuovoLibro(Libro *libri, int *ptrNumLibri, int *ptrCapLibri);
-void visualizzaTuttiILibri(Libro *libri, int numLibri);
-void cercaLibroPerISBN(Libro *libri,int numLibri);
-int formatoCorrettoISBN(char *s);
-void cercaLibriPerAutore(Libro *libri,int numLibri);
-void libriDisponibiliPerPrestito(Libro *libri,int numLibri);
-int menu_errore_inserimento_ISBN();
 
+/*
+MENU GESTIONE FILE
+*/
 
-// Funzioni menu gestione prestiti
+int menuGestioneFile(Libro *libri, int numLibri, int capLibri, Utente *utenti, int numUtenti, int capUtenti, Prestito *prestiti, int numPrestiti, int capPrestiti);
+void salvaDatabaseSuFileBinario(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti);
+int caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Utente **utenti, int *numUtenti, int *capUtenti, Prestito **prestiti, int *numPrestiti, int *capPrestiti);  // cap... è la capacità attuale
+void esportaCatalogoInFormatoTesto(Libro *libri, int numLibri);
+void esportaReportPrestitiInFormatoTesto(Prestito *prestiti, int numPrestiti, Libro *libri, int numLibri, Utente *utenti, int numUtenti);
+void chiediSalvataggio(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti);
+
+/*
+MENU GESTIONE STATISTICHE E REPORT
+*/
+
+void menuGestioneStatisticheReport(Libro *database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti); 
+void statisticheGenerali(Libro *database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti);
+int calcolaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti, int *out_indice_libro, int *out_conteggio);
+void visualizzaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti);
+void libriPerGenere(Libro* database_libri, int libri_inseriti);
+void top5LibriPiuPrestati(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti);
+
+/*
+MENU GESTIONE UTENTI
+*/
+Utente* menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capacita_attuale_utenti);
+
+// Inserimento utente
+Utente* inserisci_nuovo_utente(Utente* database_utenti,int* utenti_inseriti,int* capacita_utenti_attuale);
+int inserimento_dati_utenti(Utente* database_utenti,int* utenti_inseriti);
+int inserimento_codice_utente(Utente* database_utenti,int* utenti_inseriti);
+void inserimento_data_iscrizione(Utente* database_utenti,int* utenti_inseriti);
+void inserimento_email(Utente* database_utenti,int* utenti_inseriti);
+
+// Visualizzazione degli utenti
+void visualizza_tutti_gli_utenti(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_alfabetico_nomi(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_alfabetico_cognomi(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_email(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_codice_utente(Utente* database_utenti,int utenti_inseriti);
+int stampa_ordine_data_iscrizione(Utente* database_utenti,int utenti_inseriti);
+void stampa_dati_utenti(Utente* database_utenti, int utenti_inseriti, int* indici_ordinati);
+
+// Ricerca utente
+void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti);
+
+/* 
+MENU GESTIONE PRESTITI
+*/
+
 // Registrazione prestiti
 Prestito* menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Prestito* database_prestiti,int* utenti_inseriti, int* libri_inseriti,int* prestiti_inseriti,int* capacita_attuale_prestiti);
 Prestito* registra_prestito(Libro* database_libri,Utente* database_utenti,Prestito* database_prestiti,int* prestiti_inseriti,int* capacita_attuale_prestiti,int libri_inseriti,int utenti_inseriti);
@@ -78,47 +117,18 @@ void visualizza_prestiti_attivi(Utente* database_utenti,Prestito* database_prest
 void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* database_prestiti,int utenti_inseriti,int prestiti_inseriti);
 void stampa_prestito(Prestito* database_prestiti,int indice_prestito_assoluto,int indice_prestito_nel_ciclo_specifico);
 
+/*
+MENU GESTIONE LIBRI
+*/
 
-// Funzioni menu gestione utenti
-// Prototipi per inserimento utente
-Utente* inserisci_nuovo_utente(Utente* database_utenti,int* utenti_inseriti,int* capacita_utenti_attuale);
-int inserimento_dati_utenti(Utente* database_utenti,int* utenti_inseriti);
-int inserimento_codice_utente(Utente* database_utenti,int* utenti_inseriti);
-void inserimento_data_iscrizione(Utente* database_utenti,int* utenti_inseriti);
-void inserimento_email(Utente* database_utenti,int* utenti_inseriti);
-int menu_codice_utente();
-int invalida_data(char* data);
-
-// Prototipi per visualizzazione degli utenti
-Utente* menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* capacita_attuale_utenti);
-void visualizza_tutti_gli_utenti(Utente* database_utenti,int utenti_inseriti);
-int stampa_ordine_alfabetico_nomi(Utente* database_utenti,int utenti_inseriti);
-int stampa_ordine_alfabetico_cognomi(Utente* database_utenti,int utenti_inseriti);
-int stampa_ordine_email(Utente* database_utenti,int utenti_inseriti);
-int stampa_ordine_codice_utente(Utente* database_utenti,int utenti_inseriti);
-int stampa_ordine_data_iscrizione(Utente* database_utenti,int utenti_inseriti);
-void stampa_dati_utenti(Utente* database_utenti, int utenti_inseriti, int* indici_ordinati);
-
-// Prototipi per ricerca utente
-void cerca_utente_per_codice(Utente* database_utenti,int utenti_inseriti);
-
-
-// Funzioni menu gestione statistiche e report
-void menuGestioneStatisticheReport(Libro *database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti); 
-void statisticheGenerali(Libro *database_libri, Utente *database_utenti, Prestito *database_prestiti, int libri_inseriti,int utenti_inseriti, int prestiti_inseriti);
-int calcolaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti, int *out_indice_libro, int *out_conteggio);
-void visualizzaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti);
-void libriPerGenere(Libro* database_libri, int libri_inseriti);
-void top5LibriPiuPrestati(Libro *database_libri, Prestito *database_prestiti, int libri_inseriti, int prestiti_inseriti);
-
-
-// Funzioni menu gestione file
-int menuGestioneFile(Libro *libri, int numLibri, int capLibri, Utente *utenti, int numUtenti, int capUtenti, Prestito *prestiti, int numPrestiti, int capPrestiti);
-void salvaDatabaseSuFileBinario(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti);
-int caricaDatabaseDaFileBinario(Libro **libri, int *numLibri, int *capLibri, Utente **utenti, int *numUtenti, int *capUtenti, Prestito **prestiti, int *numPrestiti, int *capPrestiti);  // cap... è la capacità attuale
-void esportaCatalogoInFormatoTesto(Libro *libri, int numLibri);
-void esportaReportPrestitiInFormatoTesto(Prestito *prestiti, int numPrestiti, Libro *libri, int numLibri, Utente *utenti, int numUtenti);
-void chiediSalvataggio(Libro *libri, int numLibri, Utente *utenti, int numUtenti, Prestito *prestiti, int numPrestiti);
+void menuGestioneLibri(Libro **libri, int *ptrNumLibri, int *ptrCapLibri);
+Libro* inserisciNuovoLibro(Libro *libri, int *ptrNumLibri, int *ptrCapLibri);
+void visualizzaTuttiILibri(Libro *libri, int numLibri);
+void cercaLibroPerISBN(Libro *libri,int numLibri);
+int formatoCorrettoISBN(char *s);
+void cercaLibriPerAutore(Libro *libri,int numLibri);
+void libriDisponibiliPerPrestito(Libro *libri,int numLibri);
+int menu_errore_inserimento_ISBN();
 
 int main(){
     Libro *libri;
@@ -981,34 +991,6 @@ int inserimento_dati_utenti(Utente* database_utenti,int* utenti_inseriti) {
     return 0; 
 }
 
-int menu_codice_utente() {
-
-    int scelta=0; // Se il codice è già esistente faccio scegliere all'utente se fare un altro inserimento o uscire dall'inserimento utenti.
-    printf("\nIl codice utente inserito è già esistente!\n");
-    printf("\nCosa vuoi fare?\n");
-    printf("1. Inserire un altro utente;\n");
-    printf("2. Uscire dall'inserimento utenti.\n");
-    do { // Controllo inserimento scelta corretto
-        printf("\nLa tua scelta: \n");
-        scanf("%d",&scelta);
-        switch (scelta)
-        {
-        case 1:
-            return 0;
-            break;
-        
-        case 2:
-            return 1;
-            break;
-
-        default:
-            printf("Devi inserire un numero tra 1 e 2!");
-            printf("Riprova:\n");
-            break; 
-        } 
-    } while (1);
-}
-
 int inserimento_codice_utente(Utente* database_utenti, int* utenti_inseriti) {
     int flag_codice_utente;
     int temp;
@@ -1027,10 +1009,29 @@ int inserimento_codice_utente(Utente* database_utenti, int* utenti_inseriti) {
             flag_codice_utente=0;
             if (temp == database_utenti[i].codice_utente) {
                 flag_codice_utente++;
-                int exit_flag = menu_codice_utente();
-                if (exit_flag == 1) { // Se exit_flag è 1, allora devo uscire dalla funzione inserimento_dati_utenti
-                    return 1;
-                }
+                int scelta=0; // Se il codice è già esistente faccio scegliere all'utente se fare un altro inserimento o uscire dall'inserimento utenti.
+                printf("\nIl codice utente inserito è già esistente!\n");
+                printf("\nCosa vuoi fare?\n");
+                printf("1. Inserire un altro utente;\n");
+                printf("2. Uscire dall'inserimento utenti.\n");
+                do { // Controllo inserimento scelta corretto
+                    printf("\nLa tua scelta: \n");
+                    scanf("%d",&scelta);
+                    switch (scelta)
+                    {
+                    case 1:
+                        break;
+                    
+                    case 2:
+                        return 1;
+                        break;
+
+                    default:
+                        printf("Devi inserire un numero tra 1 e 2!");
+                        printf("Riprova:\n");
+                        break; 
+                    } 
+                } while (scelta!=1);
             }
             i++;
         } while (flag_codice_utente == 0 && i < *(utenti_inseriti));
