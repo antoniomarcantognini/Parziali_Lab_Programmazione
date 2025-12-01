@@ -648,7 +648,7 @@ int calcolaLibroPiuPrestato(Libro *database_libri, Prestito *database_prestiti, 
     // definisco array dinamico di puntatori alla struct ConteggioISBN, per cercare libro piu prestato
     ConteggioISBN *conteggi = (ConteggioISBN*)malloc(libri_inseriti * sizeof(ConteggioISBN));
     if (conteggi == NULL) {
-        printf("Errore di allocazione memoria.\n");
+        printf("Errore di allocazione memoria (allocazione dinamica conteggioISBN* conteggi).\n");
         return -1; // Segnala errore
     }
     int numConteggi = 0;
@@ -901,7 +901,7 @@ Utente* menuGestioneUtenti(Utente* database_utenti, int* utenti_inseriti, int* c
                 Utente* temp;
                 temp = inserisci_nuovo_utente(database_utenti,utenti_inseriti,capacita_attuale_utenti);
                 if (temp == NULL) {
-                    printf("Errore di allocazione in memoria! Verrai reindirizzato al menù gestione utenti\n");
+                    printf("Errore di allocazione in memoria (riallocazione dinamica del database utenti)! Verrai reindirizzato al menù gestione utenti\n");
                 } else {
                     database_utenti = temp;
                 }
@@ -1484,7 +1484,7 @@ Prestito* menuGestionePrestiti(Utente* database_utenti,Libro* database_libri, Pr
                 Prestito* temp;
                 temp = registra_prestito(database_libri,database_utenti,database_prestiti,prestiti_inseriti,capacita_attuale_prestiti,*libri_inseriti,*utenti_inseriti);
                 if (temp == NULL) { // Controllo che l'eventuale riallocazione sia avvenuta con successo
-                    printf("\nErrore di allocazione in memoria! Verrai reindirizzato al menù gestione prestiti\n");
+                    printf("\nErrore di allocazione in memoria (riallocazione dinamica del database prestiti)! Verrai reindirizzato al menù gestione prestiti\n");
                 } else {
                     database_prestiti = temp; // Se è avvenuta con successo, aggiorno tale puntatore.
                 }
@@ -1950,6 +1950,7 @@ void visualizza_prestiti_attivi(Utente* database_utenti,Prestito* database_prest
             // Stampa data prestito e data restituzione
             printf("  5. Data prestito: %s\n",database_prestiti[i].data_prestito);
             printf("  6. Data di restituzione prevista: %s\n",database_prestiti[i].data_restituzione_prevista);
+            printf("  7. Codice prestito: %d\n",database_prestiti[i].codice_prestito);
         }
     }
 }
@@ -2011,7 +2012,7 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
 
     // Controllo allocazione dinamica
     if (posizioni_restituiti==NULL) {
-        printf("\nErrore di allocazione in memoria! Verrai reindirizzato al menù gestione prestiti.\n");
+        printf("\nErrore di allocazione in memoria (allocazione dinamica della variabile posizioni_restituiti)! Verrai reindirizzato al menù gestione prestiti.\n");
         return;
     }
 
@@ -2028,7 +2029,7 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti,Prestito* databa
                 if (capacita_posizioni_restituiti<=++indice_prestito_restituito) { // Eventuale riallocazione dinamica di posizioni_restituiti
                     posizioni_restituiti = realloc(posizioni_restituiti,2*capacita_posizioni_restituiti*sizeof(int));
                     if (posizioni_restituiti==NULL) {
-                        printf("\nErrore di allocazione in memoria! Verrai reindirizzato al menù gestione prestiti.\n");
+                        printf("\nErrore di allocazione in memoria (riallocazione dinamica della variabile prestiti_restituiti)! Verrai reindirizzato al menù gestione prestiti.\n");
                         return;
                     }
                     capacita_posizioni_restituiti = 2*capacita_posizioni_restituiti;
