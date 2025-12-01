@@ -4,6 +4,7 @@ NON STAMPA I PRESTITI RESTITUITI (RICK)
 INSERIRE "AGGIUNGI COPIE" (futuro)  
 Se Libri/Utenti/Prestiti == NULL Nella lettura del database, bisogna uscire                                     da tutto il programma (e fare i vari free) (RICK)   
 Controllare bug visualizzazione utenti (RICK)
+controllare visualizzazione prestiti, mandare a schermo il codice sequenziale del prestito!!!
 
 # PARTE DELLA DISCUSSIONE CON LE CHIAMATE DEI DOPPI PUNTATORI
 Riassunto delle modifiche essenziali
@@ -21,6 +22,7 @@ Se usi un puntatore singolo (Libro *libri), il main non verrà mai a sapere che 
 Perché nel tuo caso la Soluzione 1 è obbligatoria per menuGestioneFile?
 Perché quella funzione deve modificare TRE array contemporaneamente (libri, utenti, prestiti). In C puoi restituire (return) un solo valore alla volta. Quindi l'unico modo per modificare 3 puntatori è passarli tutti e tre come doppi puntatori (**).
 
+# 
 
 # IDEE: 
 Inserire aggiungi copie
