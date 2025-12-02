@@ -4,7 +4,7 @@
 #include <ctype.h>
 
 typedef struct {
-    char codice_isbn[18]; // Modificato in minuscolo per coerenza snake_case
+    char codice_isbn[18];
     char titolo[101];
     char autore[51];
     int anno_pubblicazione;
@@ -22,7 +22,7 @@ typedef struct {
 
 typedef struct {
     int codice_prestito;
-    char codice_isbn_libro[18]; // Modificato in minuscolo per coerenza snake_case
+    char codice_isbn_libro[18];
     int codice_utente;
     char data_prestito[11];
     char data_restituzione_prevista[11];
@@ -92,12 +92,10 @@ int richiesta_codice_isbn(Libro* database_libri, int libri_inseriti, char isbn[]
 int invalida_isbn(char isbn[18]);
 int invalida_data(char data[11]);
 void controlla_esistenza_libro(Libro* database_libri, int libri_inseriti, char isbn[], int* posizione_libro);
-int menu_codice_isbn_non_valido();
 
 // Richiesta utente
 void richiesta_codice_utente(Utente* database_utenti, int utenti_inseriti, int* codice, int* posizione_utente);
 void controlla_esistenza_utente(Utente* database_utenti, int utenti_inseriti, int codice, int* posizione_utente);
-int menu_codice_utente_non_valido();
 
 // Calcolo data di restituzione
 void calcola_30_giorni_dopo(char data[]);
@@ -108,7 +106,6 @@ void costruisci_stringa_da_data(char data[], int anno, int mese, int giorno);
 
 // Registrazione restituzioni
 void registra_restituzione(Prestito* database_prestiti, Libro* database_libri, int prestiti_inseriti, int libri_inseriti);
-int menu_codice_prestito_errato();
 
 // Visualizzazione dei prestiti attivi
 void visualizza_prestiti_attivi(Utente* database_utenti, Prestito* database_prestiti, Libro* database_libri, int libri_inseriti, int prestiti_inseriti, int utenti_inseriti);
@@ -880,6 +877,7 @@ void top_5_libri_piu_prestati(Libro *database_libri, Prestito *database_prestiti
 
 
 // === MENU GESTIONE UTENTI ===
+// Funzione che visualizza il menu
 Utente* menu_gestione_utenti(Utente* database_utenti, int* utenti_inseriti, int* capacita_attuale_utenti){
     int scelta;
     do { 
@@ -899,9 +897,11 @@ Utente* menu_gestione_utenti(Utente* database_utenti, int* utenti_inseriti, int*
             case 1:
                 Utente* temp;
                 temp = inserisci_nuovo_utente(database_utenti,utenti_inseriti,capacita_attuale_utenti);
+                // La controllo che la riallocazione dinamica sia andata a buon fine
                 if (temp == NULL) {
                     printf("Errore di allocazione in memoria (riallocazione dinamica del database utenti)! Verrai reindirizzato al menù gestione utenti\n");
                 } else {
+                    // Se è andato a buon fine, aggiorno il database
                     database_utenti = temp;
                 }
                 break;
@@ -934,12 +934,12 @@ Utente* menu_gestione_utenti(Utente* database_utenti, int* utenti_inseriti, int*
 */
 
 Utente* inserisci_nuovo_utente(Utente *database_utenti, int *utenti_inseriti, int *capacita_utenti_attuale) {
-// Assegnare a questa funzione una variabile Utente temporanea su cui caricare la riallocazione dinamica del database utenti.
 
     // Riallocazione dinamica
     if (*utenti_inseriti == *capacita_utenti_attuale) {
         database_utenti = realloc(database_utenti,sizeof(Utente)*2*(*capacita_utenti_attuale));
-        if (database_utenti == NULL) { // Per risparmiare tempo, in caso di errore di allocazione esco subito dalla funzione
+        // Per risparmiare tempo, in caso di errore di allocazione esco subito dalla funzione
+        if (database_utenti == NULL) {
             return NULL;
         }
         *capacita_utenti_attuale = 2* *capacita_utenti_attuale;
@@ -947,7 +947,8 @@ Utente* inserisci_nuovo_utente(Utente *database_utenti, int *utenti_inseriti, in
     
     // Inserimento dati del nuovo utente
     int exit_flag;
-    exit_flag=inserimento_dati_utenti(database_utenti,utenti_inseriti);
+    exit_flag = inserimento_dati_utenti(database_utenti,utenti_inseriti);
+    // Se exit_flag è 1, l'utente ha deciso di smettere di inserire l'utente. Dunque non bisogna stampare la conferma
     if (exit_flag == 0) {
         printf("\nUtente inserito correttamente!\n\n");
     }
@@ -960,7 +961,8 @@ int inserimento_dati_utenti(Utente* database_utenti, int* utenti_inseriti) {
     // Inserimento codice utente
     int exit_flag;
     exit_flag = inserimento_codice_utente(database_utenti,utenti_inseriti);
-    if (exit_flag == 1) { // Controllo uscita da inserimento dati
+    // Se exit_flag = 1, l'utente ha deciso di uscire dall'inserimento dati e quindi bisogna uscire subito
+    if (exit_flag == 1) {
         return 1;
     }
 
@@ -984,26 +986,36 @@ int inserimento_codice_utente(Utente* database_utenti, int* utenti_inseriti) {
     int flag_codice_utente;
     int temp;
 
-    do { // Questo ciclo ricomincia se il codice non è univoco
+    // Questo ciclo ricomincia se il codice non è univoco
+    do { 
         printf("Inserisci i dati dell'utente: \n");
         printf("  - Codice utente: ");
+
+        // Ciclo che obbliga l'utente a inserire un codice positivo
         do {
             scanf("%d",&temp);
             if(temp<=0) {
             printf("Il codice utente deve essere positivo! Riprova: ");
             }
         } while (temp<=0);
+        
         int i=0;
-        do { // Controllo del codice univoco
+        
+        // Ciclo di controllo del codice univoco
+        do { 
             flag_codice_utente=0;
             if (temp == database_utenti[i].codice_utente) {
                 flag_codice_utente++;
+                
+                // Menù per far scegliere all'utente se o meno vuole continuare ad inserire l'utente
                 int scelta=0; // Se il codice è già esistente faccio scegliere all'utente se fare un altro inserimento o uscire dall'inserimento utenti.
                 printf("\nIl codice utente inserito è già esistente!\n");
                 printf("\nCosa vuoi fare?\n");
                 printf("1. Inserire un altro utente;\n");
                 printf("2. Uscire dall'inserimento utenti.\n");
-                do { // Controllo inserimento scelta corretto
+                
+                // Controllo inserimento corretto per il suddetto menù
+                do { 
                     printf("\nLa tua scelta: \n");
                     scanf("%d",&scelta);
                     switch (scelta)
@@ -1021,21 +1033,27 @@ int inserimento_codice_utente(Utente* database_utenti, int* utenti_inseriti) {
                         break; 
                     } 
                 } while (scelta!=1);
+
             }
+
             i++;
+        
         } while (flag_codice_utente == 0 && i < *(utenti_inseriti));
+        
         i=0;
+    
     } while (flag_codice_utente != 0);
 
     database_utenti[*(utenti_inseriti)].codice_utente = temp;
     return 0;
 }
 
-// funzione inserimento data di iscrizione
+// funzione per l'inserimento data di iscrizione
 void inserimento_data_iscrizione(Utente* database_utenti, int* utenti_inseriti) {
-    char data[11];
+    char data[11]; // Variabile d'appoggio su cui fare controlli
     
-    do { // Controllo inserimento corretto
+    // Ciclo di controllo dell'inserimento
+    do { 
         printf("  - Data di iscrizione: ");
         scanf("%10s",data);
 
@@ -1050,10 +1068,12 @@ void inserimento_data_iscrizione(Utente* database_utenti, int* utenti_inseriti) 
     strcpy(database_utenti[*(utenti_inseriti)].data_iscrizione,data);
 }
 
+// funzione per l'inserimento dell'email
 void inserimento_email(Utente* database_utenti, int* utenti_inseriti) {
-    char email[81];
+    char email[81]; // Variabile d'appoggio su cui fare i controlli
     
-    do { // Controllo inserimento corretto
+    // Ciclo di controllo inserimento corretto
+    do { 
         printf("  - Email: ");
         scanf("%s",email);
 
@@ -1074,10 +1094,12 @@ void inserimento_email(Utente* database_utenti, int* utenti_inseriti) {
   == VISUALIZZAZIONE UTENTI ==
 */
 
+// Funzione che stampa tutti gli utenti nel database
 void visualizza_tutti_gli_utenti(Utente* database_utenti, int utenti_inseriti) {
     
     int scelta = 0;
     
+    // Ciclo che fa tornare al menù di visualizzazione utenti finché l'utente non decide di uscire
     do {
         // Stampa Menù visualizzazione utenti
         printf("== MENÙ VISUALIZZAZIONE UTENTI ==\n");
@@ -1091,14 +1113,25 @@ void visualizza_tutti_gli_utenti(Utente* database_utenti, int utenti_inseriti) {
         scanf("%d", &scelta);
 
         // Switch menù
+        int flag;
         switch (scelta)
         {
         case 1:
-            stampa_ordine_alfabetico_nomi(database_utenti,utenti_inseriti);
+            flag = stampa_ordine_alfabetico_nomi(database_utenti,utenti_inseriti);
+            if (flag = 1) {
+                printf("Errore di allocazione in memoria (indici ordinati). Verrai reindirizzato al menù visualizzazione utenti");
+            } else if (flag = 2) {
+                printf("Errore di allocazione in memoria (vettore di nomi e cognomi). Verrai reindirizzato al menù visualizzazione utenti");
+            }
             break;
 
         case 2:
-            stampa_ordine_alfabetico_cognomi(database_utenti,utenti_inseriti);
+            flag = stampa_ordine_alfabetico_cognomi(database_utenti,utenti_inseriti);
+            if (flag = 1) {
+                printf("Errore di allocazione in memoria (indici ordinati). Verrai reindirizzato al menù visualizzazione utenti");
+            } else if (flag = 2) {
+                printf("Errore di allocazione in memoria (vettore di cognomi e nomi). Verrai reindirizzato al menù visualizzazione utenti");
+            }
             break;
 
         case 3:
@@ -1124,14 +1157,17 @@ void visualizza_tutti_gli_utenti(Utente* database_utenti, int utenti_inseriti) {
     } while (scelta != 6);
 }
 
-
+// Funzione che stampa gli utenti in ordine alfabetico (considerando prima i nomi e poi i cognomi)
 int stampa_ordine_alfabetico_nomi(Utente* database_utenti, int utenti_inseriti) {
     
-    // Inizializzazione vettore degli indici
+    // Inizializzazione vettore degli indici (poiché la potenziale dimensione di tale vettore è come quello del database utenti, bisogna allocarlo dinamicamente)
     int* indici_ordinati = malloc(utenti_inseriti*sizeof(int));
+    
     if (indici_ordinati==NULL) {
         return 1;
     }
+
+    // Rendo indici_ordinati il vettore identità
     for (int i=0;i<utenti_inseriti;i++) {
         indici_ordinati[i]=i;
     }
@@ -1140,7 +1176,7 @@ int stampa_ordine_alfabetico_nomi(Utente* database_utenti, int utenti_inseriti) 
     char (*nomi_cognomi)[102]=malloc(utenti_inseriti*sizeof(*nomi_cognomi));
     if (nomi_cognomi==NULL) {
         free(indici_ordinati);
-        return 1;
+        return 2;
     }
     for (int i=0;i<utenti_inseriti;i++) {
         strcpy(nomi_cognomi[i],database_utenti[i].nome);
@@ -1176,9 +1212,12 @@ int stampa_ordine_alfabetico_cognomi(Utente* database_utenti, int utenti_inserit
     
     // Inizializzazione vettore degli indici
     int* indici_ordinati = malloc(utenti_inseriti*sizeof(int));
+
     if (indici_ordinati == NULL) {
         return 1;
     }
+
+    // Rendo indici_ordinati il vettore identità
     for (int i=0;i<utenti_inseriti;i++) {
         indici_ordinati[i]=i;
     }
@@ -1187,7 +1226,7 @@ int stampa_ordine_alfabetico_cognomi(Utente* database_utenti, int utenti_inserit
     char (*cognomi_nomi)[102]=malloc(utenti_inseriti*sizeof(*cognomi_nomi));
     if (cognomi_nomi==NULL) {
         free(indici_ordinati);
-        return 1;
+        return 2;
     }
     for (int i=0;i<utenti_inseriti;i++) {
         strcpy(cognomi_nomi[i],database_utenti[i].cognome);
@@ -1226,6 +1265,8 @@ int stampa_ordine_email(Utente* database_utenti, int utenti_inseriti) {
     if (indici_ordinati==NULL) {
         return 1;
     }
+
+    // Rendo indici_ordinati il vettore identità
     for (int i=0;i<utenti_inseriti;i++) {
         indici_ordinati[i]=i;
     }
@@ -1256,6 +1297,8 @@ int stampa_ordine_codice_utente(Utente* database_utenti, int utenti_inseriti) {
     if (indici_ordinati==NULL) {
         return 1;
     }
+
+    // Rendo indici_ordinati il vettore identità
     for (int i=0;i<utenti_inseriti;i++) {
         indici_ordinati[i]=i;
     }
@@ -1287,6 +1330,8 @@ int stampa_ordine_data_iscrizione(Utente* database_utenti, int utenti_inseriti) 
     if (indici_ordinati==NULL) {
         return 1;
     }
+
+    // Rendo indici_ordinati il vettore identità
     for (int i=0;i<utenti_inseriti;i++) {
         indici_ordinati[i]=i;
     }
@@ -1343,6 +1388,7 @@ int stampa_ordine_data_iscrizione(Utente* database_utenti, int utenti_inseriti) 
         giorno[i]+=(temp[1]-'0');
     }
 
+    // A ogni indice associo il numero aaaammgg per ordinare facilmente.
     int* valore_data=malloc(utenti_inseriti*sizeof(int));
     if (valore_data==NULL) {
         free(indici_ordinati);
@@ -1379,6 +1425,7 @@ int stampa_ordine_data_iscrizione(Utente* database_utenti, int utenti_inseriti) 
     return 0;
 }
 
+// Funzione che stampa i dati degli utenti secondo l'ordine dato da indici_ordinati
 void stampa_dati_utenti(Utente* database_utenti, int utenti_inseriti, int* indici_ordinati) {
     for (int i=0;i<utenti_inseriti;i++) {
         printf("\nUtente %d:\n",i+1);
@@ -1394,6 +1441,7 @@ void stampa_dati_utenti(Utente* database_utenti, int utenti_inseriti, int* indic
    == RICERCA UTENTI TRAMITE CODICE UTENTE == 
 */
 
+// Funzione che cerca utenti tramite il codice
 void cerca_utente_per_codice(Utente* database_utenti, int utenti_inseriti) {
 
     int src_flag=-1;
@@ -1412,15 +1460,19 @@ void cerca_utente_per_codice(Utente* database_utenti, int utenti_inseriti) {
             }
         }
 
-        // Stampa dati utente	
-        if (src_flag==-1) { // Se l'utente non è stato trovato, è possibile inserirne un altro oppure tornare alla gestione utenti
+        // Stampa dati utente
+
+        // Se l'utente non è stato trovato, è possibile inserirne un altro oppure tornare alla gestione utenti	
+        if (src_flag==-1) { 
             int scelta;
             printf("\nNon è stato trovato alcun utente con il codice inserito!\n");
             printf("Cosa vuoi fare?\n");
             printf("\n  1. Inserire un altro codice utente;\n");
             printf("  2. Tornare al menù gestione utenti.\n");
             printf("\nLa tua scelta: ");
-            do { // Ciclo per la scelta dell'utente
+
+            // Ciclo per la scelta dell'utente
+            do { 
                 
                 // Inserimento scelta
                 scanf("%d",&scelta);
@@ -1440,7 +1492,9 @@ void cerca_utente_per_codice(Utente* database_utenti, int utenti_inseriti) {
                     break;
                 }
             } while (scelta != 1);
-        } else { // Se l'utente viene trovato, vengono stampati i suoi dati.
+
+        // Se l'utente viene trovato, vengono stampati i suoi dati.
+        } else { 
             printf("Utente trovato!\n");
             printf("  Nome: %s\n",database_utenti[src_flag].nome);
             printf("  Cognome: %s\n",database_utenti[src_flag].cognome);
@@ -1454,8 +1508,11 @@ void cerca_utente_per_codice(Utente* database_utenti, int utenti_inseriti) {
 }
 
 // === MENU GESTIONE PRESTITI === //
+
+// Funzione che gestisce il menù dei prestiti
 Prestito* menu_gestione_prestiti(Utente* database_utenti, Libro* database_libri, Prestito* database_prestiti, int* utenti_inseriti, int* libri_inseriti, int* prestiti_inseriti, int* capacita_attuale_prestiti){
     int scelta;
+    // Ciclo per la scelta dell'utente
     do {        
         // Stampa Menù
         printf("\n== MENU' GESTIONE PRESTITI ==\n");
@@ -1566,11 +1623,10 @@ void richiedi_libro_utente(Libro* database_libri, Utente* database_utenti, int* 
     char isbn[18];
     int codice=0;
     int exit_flag_isbn;
-    int exit_flag_codice_utente;
     
     // Richiesta codice ISBN
     exit_flag_isbn=richiesta_codice_isbn(database_libri,libri_inseriti,isbn,posizione_libro);
-    if (exit_flag_isbn==-1) { // Se c'è errore nella richiesta del codice ISBN, posso (anzi devo) evitare di controllare il codice utente
+    if (exit_flag_isbn==-1) { // Se c'è errore nella richiesta del codice ISBN, posso (anzi devo) evitare di controllare il codice utente, dunque faccio return
         return;
     }
 
@@ -1579,11 +1635,13 @@ void richiedi_libro_utente(Libro* database_libri, Utente* database_utenti, int* 
     return;
 }
 
-
-int invalida_isbn(char isbn[18]) {  // ritorna 1 se non è valido, 0 altrimenti
+// funzione che controlla l'inserimento dell'ISBN: ritorna 1 se non è valido, 0 altrimenti
+int invalida_isbn(char isbn[18]) {  
+    // Controllo di lunghezza della stringa (altrimenti non posso fare il controllo booleano sotto)
     if (strlen(isbn)!=17) {
         return 1;
     }
+    // La seguente espressione booleana controlla che i valori "X" di un codice ISBN siano "digit" e che i trattini siano messi correttamente
     return  isbn[0] < '0' || isbn[0] > '9' ||
             isbn[1] < '0' || isbn[1] > '9' ||
             isbn[2] < '0' || isbn[2] > '9' ||
@@ -1601,11 +1659,13 @@ int invalida_isbn(char isbn[18]) {  // ritorna 1 se non è valido, 0 altrimenti
             isbn[10] != '-' || isbn[15] != '-';
 }
 
-
+// funzione che controlla l'inserimento dell'ISBN: ritorna 1 se non è valido, 0 altrimenti
 int invalida_data(char data[11]) {
+    // Controllo di lunghezza della stringa (altrimenti non posso fare il controllo booleano sotto)
     if (strlen(data)!=10) {
         return 1;
     }
+    // La seguente espressione booleana controlla che i valori "a,m,g" di una data siano "digit" e che i caratteri "/" siano inseriti correttamente.
     return  data[0] < '0' || data[0] > '9' ||
             data[1] < '0' || data[1] > '9' ||
             data[3] < '0' || data[3] > '9' ||
@@ -1617,31 +1677,9 @@ int invalida_data(char data[11]) {
             data[2] != '/' || data[5] != '/';
 }
 
-
-int menu_codice_isbn_non_valido() {
-    int scelta=0;
-    printf("\nCosa vuoi fare ora?\n");
-    printf("\n  1. Inserire un nuovo codice ISBN per il libro\n");
-    printf("  2. Tornare al menù di gestione dei prestiti.\n");
-    do {
-        scanf("%d",&scelta);
-        switch (scelta)
-        {
-        case 1:
-            return 0;
-        
-        case 2:
-            return -1;
-
-        default:
-            printf("\nLa scelta deve essere 1 oppure 2! Riprova: ");
-            break;
-        }
-    } while(1);
-}
-
-
+// Questa funzione modifica la posizione del libro cercato e restituisce -1 se il libro non è stato trovato
 void controlla_esistenza_libro(Libro* database_libri, int libri_inseriti, char isbn[], int* posizione_libro) {
+    // Ciclo di ricerca del libro
     for (int i=0;i<libri_inseriti;i++) {
         if (strcmp(isbn,database_libri[i].codice_isbn)==0) {
             printf("\nLibro trovato correttamente!\n");
@@ -1649,12 +1687,14 @@ void controlla_esistenza_libro(Libro* database_libri, int libri_inseriti, char i
             return;
         } 
     }
+
+    // Se non trova il libro imposta la posizione del libro a -1
     printf("Non è stato trovato alcun libro con tale codice!");
     *posizione_libro=-1;
     return;
 }
 
-
+// Questa funzione richiede l'isbn del libro
 int richiesta_codice_isbn(Libro* database_libri, int libri_inseriti, char isbn[], int* posizione_libro) {
     do {
         printf("\nInserisci il codice ISBN del libro (XXX-X-XXXX-XXXX-X): ");
@@ -1675,11 +1715,25 @@ int richiesta_codice_isbn(Libro* database_libri, int libri_inseriti, char isbn[]
         
         // Controllo se l'utente vuole ancora inserire un prestito
         if (invalida_isbn(isbn) || *posizione_libro == -1) {
-            int exit_flag;
-            exit_flag=menu_codice_isbn_non_valido();
-            if (exit_flag == -1) {
-                return -1;
-            }
+            int scelta=0;
+            printf("\nCosa vuoi fare ora?\n");
+            printf("\n  1. Inserire un nuovo codice ISBN per il libro\n");
+            printf("  2. Tornare al menù di gestione dei prestiti.\n");
+            do {
+                scanf("%d",&scelta);
+                switch (scelta)
+                {
+                case 1:
+                    break;
+                
+                case 2:
+                    return -1;
+
+                default:
+                    printf("\nLa scelta deve essere 1 oppure 2! Riprova: ");
+                    break;
+                }
+            } while(1);
         }
     
     } while (invalida_isbn(isbn) || *posizione_libro == -1);
@@ -1687,6 +1741,8 @@ int richiesta_codice_isbn(Libro* database_libri, int libri_inseriti, char isbn[]
 }
 
 void richiesta_codice_utente(Utente* database_utenti, int utenti_inseriti, int* codice, int* posizione_utente) {
+    
+    // Ciclo di controllo dell'inserimento del codice
     do {
         printf("\nInserisci il codice utente: ");
         scanf("%d",codice);
@@ -1701,17 +1757,32 @@ void richiesta_codice_utente(Utente* database_utenti, int utenti_inseriti, int* 
 
         // Controllo se l'utente vuole ancora inserire un prestito
         if (*codice<=0 || *posizione_utente == -1) {
-            int exit_flag;
-            exit_flag = menu_codice_utente_non_valido();
-            if (exit_flag == -1) {
-                return;
-            }
+            int scelta=0;
+            printf("\nCosa vuoi fare ora?\n");
+            printf("\n  1. Inserire un nuovo codice utente\n");
+            printf("  2. Tornare al menù di gestione dei prestiti.\n");
+            printf("\nLa tua scelta: ");
+            do {
+                scanf("%d",&scelta);
+                switch (scelta)
+                {
+                case 1:
+                    break;
+                
+                case 2:
+                    return;
+
+                default:
+                    printf("\nLa scelta deve essere 1 oppure 2! Riprova: ");
+                    break;
+                }
+            } while(1);
         }
 
     } while (*posizione_utente == -1 || *codice <= 0);
 }
 
-
+// Funzione che restituisce la posizione dell'utente. Se l'utente non esiste la posizione viene aggiornata a -1
 void controlla_esistenza_utente(Utente* database_utenti, int utenti_inseriti, int codice, int* posizione_utente) {
     for (int i=0;i<utenti_inseriti;i++) {
         if (codice == database_utenti[i].codice_utente) {
@@ -1724,31 +1795,7 @@ void controlla_esistenza_utente(Utente* database_utenti, int utenti_inseriti, in
     *posizione_utente=-1;
 }
 
-
-int menu_codice_utente_non_valido() {
-    int scelta=0;
-    printf("\nCosa vuoi fare ora?\n");
-    printf("\n  1. Inserire un nuovo codice utente\n");
-    printf("  2. Tornare al menù di gestione dei prestiti.\n");
-    printf("\nLa tua scelta: ");
-    do {
-        scanf("%d",&scelta);
-        switch (scelta)
-        {
-        case 1:
-            return 0;
-        
-        case 2:
-            return -1;
-
-        default:
-            printf("\nLa scelta deve essere 1 oppure 2! Riprova: ");
-            break;
-        }
-    } while(1);
-}
-
-
+// Funzione che calcola 30 giorni dopo la data inserita
 void calcola_30_giorni_dopo(char data[]) {
     int anno;
     int mese;
@@ -1761,14 +1808,14 @@ void calcola_30_giorni_dopo(char data[]) {
     costruisci_stringa_da_data(data,anno,mese,giorno);
 }
 
-
+// Funzione che trasforma la stringa in interi
 void estrapola_data_numerica(char data[], int* anno, int* mese, int* giorno) {
     *anno = (data[9]-'0') + 10*(data[8]-'0') + 100*(data[7]-'0') + 1000*(data[6]-'0');
     *mese = (data[4]-'0') + 10*(data[3]-'0');
     *giorno = (data[1]-'0') + 10*(data[0]-'0');
 }
 
-
+// Funzione che calcola il numero di giorni dall'anno 0
 int calcola_data_valore(int* anno, int* mese, int* giorno) {
     int data_valore;
     int trentuno=0;
@@ -1788,18 +1835,20 @@ int calcola_data_valore(int* anno, int* mese, int* giorno) {
     return data_valore;
 }
 
+// Funzione che ricalcola la data a partire dal numero di giorni dall'anno 0
 void costruisci_data_da_valore_data(int data_valore, int* anno, int* mese, int* giorno) {
     
-    int valore_anno;
+    int valore_anno; // Variabile del numero di giorni dall'anno 0 al giorno prima della fine dell'anno provvisorio
     int flag_non_bisestile;
     int giorni_da_inizio_anno;
 
+    // Approssimazione iniziale dell'anno
     int anno_provvisorio = data_valore / 365 +1;
 
-    // Aggiustamento anno
+    // Calcolo dell'anno corretto
     do {
         anno_provvisorio--;
-        valore_anno = anno_provvisorio*365+(anno_provvisorio-1)/4-(anno_provvisorio-1)/100+(anno_provvisorio-1)/400 +1; // L'ultimo +1 è necessario per considerare anche l'anno 0
+        valore_anno = anno_provvisorio*365 + (anno_provvisorio-1)/4 - (anno_provvisorio-1)/100 + (anno_provvisorio-1)/400 + 1; // L'ultimo +1 è necessario per considerare anche l'anno 0
         flag_non_bisestile = ((anno_provvisorio%4)!=0 || (anno_provvisorio%100)==0) && ((anno_provvisorio%400)!=0);
         giorni_da_inizio_anno = data_valore-valore_anno;
     } while (giorni_da_inizio_anno <= 0);
@@ -1814,11 +1863,12 @@ void costruisci_data_da_valore_data(int data_valore, int* anno, int* mese, int* 
             return;
         }
     }
+    // Se esco dal ciclo, significa che è Dicembre.
     *mese = 12;
     *giorno = giorni_da_inizio_anno-giorni_dei_mesi[11];
 }
 
-
+// Funzione che ricostruisce la stringa dai valori int.
 void costruisci_stringa_da_data(char data[], int anno, int mese, int giorno) {
     data[0] = giorno / 10 +'0';
     data[1] = giorno % 10 + '0';
@@ -1839,24 +1889,47 @@ void registra_restituzione(Prestito* database_prestiti, Libro* database_libri, i
     // Richiedi prestito
     int codice;
     printf("\nInserisci il codice del prestito da modificare:\n");
+    
+    // Ciclo per controllare l'inserimento del codice
     do{ 
         printf("\nLa tua scelta: ");
         scanf("%d",&codice);
         if (codice<=0) {
             printf("\nIl codice del prestito deve essere un numero positivo!\n");
-        } else if (codice>prestiti_inseriti) { // Questo controllo funziona perché il codice è sequenziale.
+        } else if (codice>prestiti_inseriti) { // Questo controllo funziona perché il codice prestito è sequenziale.
             printf("\nIl codice del prestito è inesistente!\n");
         }
 
+        // Controllo dell'inserimento
         if (codice<=0 || codice>prestiti_inseriti) {
-            int flag=menu_codice_prestito_errato();
-            if (flag==1) {
-                return;
-            }
+            int scelta=0;
+
+            // Menù di scelta: tornare al menù o inserire un nuovo codice prestito?
+            printf("\nCosa vuoi fare?\n");
+            printf("\n  1. Inserire un nuovo codice di prestito;\n");
+            printf("  2. Tornare al menù gestione prestiti.");
+            
+            // Ciclo menù suddetto
+            do {
+                printf("\nLa tua scelta\n");
+                scanf("%d",&scelta);
+                switch (scelta) {
+                    
+                case 1: 
+                    break;
+
+                case 2:
+                    return;
+
+                default:
+                    printf("\nLa scelta deve esserd 1 oppure 2! Riprova:\n");
+                    break;
+                }
+            } while (1);
         }
     } while (codice<=0 || codice>prestiti_inseriti);
 
-    // Controllo esistenza codice, assegnazjone restituito e aumento numero di copie.
+    // Controllo esistenza codice, assegnazione restituito e aumento numero di copie.
     for (int i=0;i<prestiti_inseriti;i++) {
         if (codice == database_prestiti[i].codice_prestito) {   
             if(database_prestiti[i].restituito == 0) {
@@ -1875,33 +1948,6 @@ void registra_restituzione(Prestito* database_prestiti, Libro* database_libri, i
         }
     }
     return;
-}
-
-
-int menu_codice_prestito_errato() {
-    
-    int scelta;
-    printf("\nCosa vuoi fare?\n");
-    printf("\n  1. Inserire un nuovo codice di prestito;\n");
-    printf("  2. Tornare al menù gestione prestiti.");
-    do {
-        printf("\nLa tua scelta\n");
-        scanf("%d",&scelta);
-        switch (scelta) {
-            
-        case 1: 
-            return 0;
-
-        case 2:
-            return 1;
-
-        default:
-            printf("\nLa scelta deve esserd 1 oppure 2! Riprova:\n");
-            break;
-        }
-    } while (1);
-    return 0;
-
 }
 
 // funzione visualizza prestiti attivi
@@ -1940,7 +1986,6 @@ void visualizza_prestiti_attivi(Utente* database_utenti, Prestito* database_pres
             // Stampa data prestito e data restituzione
             printf("  5. Data prestito: %s\n",database_prestiti[i].data_prestito);
             printf("  6. Data di restituzione prevista: %s\n",database_prestiti[i].data_restituzione_prevista);
-            printf("  7. Codice prestito: %d\n",database_prestiti[i].codice_prestito);
         }
     }
 }
@@ -1956,6 +2001,8 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti, Prestito* datab
     do {
         int scelta;
         scanf("%d",&codice);
+
+        // Controllo che il codice sia positivo
         if (codice<=0) {
             printf("\nIl codice deve essere positivo!\n");
             printf("Cosa vuoi fare?\n");
@@ -1969,7 +2016,10 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti, Prestito* datab
                 if (scelta == 2) return;
                 printf("La tua scelta deve essere 1 oppure 2! Riprova:\n");
             } while (1);
+
         } else {
+
+            // Ciclo for per la ricerca dell'utente
             for (int i=0;i<utenti_inseriti;i++) {
                 if (database_utenti[i].codice_utente == codice) {
                     flag = i;
@@ -1977,6 +2027,8 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti, Prestito* datab
                     break;
                 }
             }
+
+            // Controllo dell'inserimento
             if (flag == -1) {
                 printf("Utente non trovato!\n");
                 printf("Cosa vuoi fare?\n");
@@ -2007,16 +2059,24 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti, Prestito* datab
     }
 
     posizioni_restituiti[0]=-1;
+
     // Ciclo per scrittura prestiti non restituiti
     for (int i=0;i<prestiti_inseriti;i++) {
+
+        // Controllo che sia il codice corretto
         if (database_prestiti[i].codice_utente == codice) {
+            
+            // Controllo se è restituito o meno
             if (database_prestiti[i].restituito == 0) {
                 if (++indice_prestito_non_restituito == 0) {
                     printf("\nPrestiti non restituiti:\n");
                 }
                 stampa_prestito(database_prestiti,i,indice_prestito_non_restituito);
+            
             } else {
-                if (capacita_posizioni_restituiti<=++indice_prestito_restituito) { // Eventuale riallocazione dinamica di posizioni_restituiti
+
+                // Controllo se è necessaria la riallocazione dinamica di posizioni_restituiti
+                if (capacita_posizioni_restituiti<=++indice_prestito_restituito) { 
                     posizioni_restituiti = realloc(posizioni_restituiti,2*capacita_posizioni_restituiti*sizeof(int));
                     if (posizioni_restituiti==NULL) {
                         printf("\nErrore di allocazione in memoria (riallocazione dinamica della variabile prestiti_restituiti)! Verrai reindirizzato al menù gestione prestiti.\n");
@@ -2028,6 +2088,8 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti, Prestito* datab
             }
         }
     }
+
+    // Avvertimento dell'assenza di prestiti attivi
     if (indice_prestito_non_restituito == -1) {
         printf("\nNon ci sono prestiti attivi per questo utente.\n");
     }
@@ -2047,6 +2109,7 @@ void visualizza_storico_prestiti_utente(Utente* database_utenti, Prestito* datab
     return;
 }
 
+// Funzione che stampa le statistiche del prestito scelto
 void stampa_prestito(Prestito* database_prestiti, int indice_prestito_assoluto, int indice_prestito_nel_ciclo_specifico) {
     printf("\nPrestito: %d\n",indice_prestito_nel_ciclo_specifico+1);
     printf("  1. Codice prestito: %d\n",database_prestiti[indice_prestito_assoluto].codice_prestito);
@@ -2078,6 +2141,8 @@ int menu_errore_inserimento_isbn() {
     } while (1);
     return 0;
 }
+
+
 // Funzione inserisci_nuovo_libro
 Libro* inserisci_nuovo_libro(Libro *libri, int *ptr_num_libri, int *ptr_cap_libri){
     
@@ -2140,7 +2205,7 @@ Libro* inserisci_nuovo_libro(Libro *libri, int *ptr_num_libri, int *ptr_cap_libr
     do {
         printf("Inserisci anno pubblicazione: ");
         scanf("%d", &anno_tmp);
-        /* controlli sul range */
+        // controlli sul range 
         if (anno_tmp < 1800 || anno_tmp > 2025) {
             printf("Anno di pubblicazione non valido (deve essere tra 1800 e 2025). Riprova.\n");
             continue;
