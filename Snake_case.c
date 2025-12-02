@@ -36,7 +36,7 @@ typedef struct {
 MENU GESTIONE FILE
 */
 
-int menu_gestione_file(Libro *libri, int num_libri, int cap_libri, Utente *utenti, int num_utenti, int cap_utenti, Prestito *prestiti, int num_prestiti, int cap_prestiti);
+int menu_gestione_file(Libro **libri, int *num_libri, int *cap_libri, Utente **utenti, int *num_utenti, int *cap_utenti, Prestito **prestiti, int *num_prestiti, int *cap_prestiti);
 void salva_database_su_file_binario(Libro *libri, int num_libri, Utente *utenti, int num_utenti, Prestito *prestiti, int num_prestiti);
 int carica_database_da_file_binario(Libro **libri, int *num_libri, int *cap_libri, Utente **utenti, int *num_utenti, int *cap_utenti, Prestito **prestiti, int *num_prestiti, int *cap_prestiti);
 void esporta_catalogo_in_formato_testo(Libro *libri, int num_libri);
@@ -216,7 +216,7 @@ int main(){
                 menu_gestione_statistiche_report(libri, utenti, prestiti, *ptr_num_libri, *ptr_num_utenti, *ptr_num_prestiti);
                 break;
             case 'E':
-                int flag_gestione_file = menu_gestione_file(libri, *ptr_num_libri, *ptr_cap_libri, utenti, *ptr_num_utenti, *ptr_cap_utenti, prestiti, *ptr_num_prestiti, *ptr_cap_prestiti);
+                int flag_gestione_file = menu_gestione_file(&libri, ptr_num_libri, ptr_cap_libri, &utenti, ptr_num_utenti, ptr_cap_utenti, &prestiti, ptr_num_prestiti, ptr_cap_prestiti);
                 if (flag_gestione_file == -1) { // Libero la memoria evitando la variabile che ha dato errore
                     flag_uscita = 1;
                 }
@@ -238,7 +238,7 @@ int main(){
 }
 
 // === MENU GESTIONE FILE === //
-int menu_gestione_file(Libro *libri, int num_libri, int cap_libri, Utente *utenti, int num_utenti, int cap_utenti, Prestito *prestiti, int num_prestiti, int cap_prestiti){
+int menu_gestione_file(Libro **libri, int *num_libri, int *cap_libri, Utente **utenti, int *num_utenti, int *cap_utenti, Prestito **prestiti, int *num_prestiti, int *cap_prestiti){
     int scelta;
     do{
         printf("=== MENU GESTIONE FILE ===\n");
@@ -254,29 +254,29 @@ int menu_gestione_file(Libro *libri, int num_libri, int cap_libri, Utente *utent
         switch(scelta)
         {
             case 1:
-            salva_database_su_file_binario(libri, num_libri, utenti, num_utenti, prestiti, num_prestiti);  
+            salva_database_su_file_binario(*libri, *num_libri, *utenti, *num_utenti, *prestiti, *num_prestiti);  
             break;
             
             case 2:
-            int flag_carica_database = carica_database_da_file_binario(&libri, &num_libri, &cap_libri, &utenti, &num_utenti, &cap_utenti, &prestiti, &num_prestiti, &cap_prestiti);
+            int flag_carica_database = carica_database_da_file_binario(libri, num_libri, cap_libri, utenti, num_utenti, cap_utenti, prestiti, num_prestiti, cap_prestiti);
             if (flag_carica_database == -1) {
                 return -1;
             }
             break;
             
             case 3:
-            esporta_catalogo_in_formato_testo(libri, num_libri);
+            esporta_catalogo_in_formato_testo(*libri, *num_libri);
             break;
             
             case 4:
-            esporta_report_prestiti_in_formato_testo(prestiti, num_prestiti, libri, num_libri, utenti, num_utenti);
+            esporta_report_prestiti_in_formato_testo(*prestiti, *num_prestiti, *libri, *num_libri, *utenti, *num_utenti);
             break;
 
             case 5:
             break;
 
             case 6:
-            chiedi_salvataggio(libri, num_libri, utenti, num_utenti, prestiti, num_prestiti);
+            chiedi_salvataggio(*libri, *num_libri, *utenti, *num_utenti, *prestiti, *num_prestiti);
             return -1;
 
             default:
@@ -1075,7 +1075,7 @@ void inserimento_email(Utente* database_utenti, int* utenti_inseriti) {
     // Ciclo di controllo inserimento corretto
     do { 
         printf("  - Email: ");
-        scanf("%s",email);
+        scanf("%80s",email);
 
         // Avvertimento per inserimento errato
         if (strchr(email,'@') == NULL) {
