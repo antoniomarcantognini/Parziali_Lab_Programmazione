@@ -376,14 +376,17 @@ int carica_database_da_file_binario(Libro **libri, int *num_libri, int *cap_libr
                 printf("Dati precedenti mantenuti.\n"); // perche non tocco *libri
                 return -1;
             } else {
-                // Leggo l'array intero
-                fread(temp_libri, sizeof(Libro), temp_num, fp);
-                // Scambio i puntatori
-                free(*libri);      // Ora posso liberare il vecchio vettore in modo sicuro
-                *libri = temp_libri;  // Assegno il nuovo
-                *num_libri = temp_num;
-                *cap_libri = nuova_capacita;
-                printf("[OK] Caricati %d libri.\n", temp_num);
+                int letti = fread(temp_libri, sizeof(Libro), temp_num, fp);
+                if (letti == temp_num){
+                    free(*libri);      // Ora posso liberare il vecchio vettore in modo sicuro
+                    *libri = temp_libri;  // Assegno il nuovo
+                    *num_libri = temp_num;
+                    *cap_libri = nuova_capacita;
+                    printf("[OK] Caricati %d libri.\n", temp_num);
+                } else{
+                    printf("[Errore] Lettura file utenti incompleta o corrotta. Dati precedenti mantenuti.\n");
+                    free(temp_libri); 
+                }
             }
         }
             fclose(fp);
