@@ -1,4 +1,4 @@
-ID Test: T01
+tuziID Test: T01
 Funzionalità testata:  Menu gestione libri -> visualizza tutti i libri nel caso in cui non è stato inserito alcun libro
 Input fornito: 2
 Output atteso: Nessun libro presente + ritorno al menu precedente
@@ -201,8 +201,8 @@ Screen
 ID Test: T27
 Funzionalità testata: menu gestione prestiti -> registra la restituzione di un libro
 Input fornito:{ 2; 1} codice del prestito
-Output atteso: prestito assegnato correttamente (cioe restituzione del prestito)
-Output ottenuto:prestito assegnato correttamente (cioe restituzione del prestito)
+Output atteso: Restituzione assegnata correttamente
+Output ottenuto:Restituzione assegnata correttamente
 Esito: 1
 Screen
 
