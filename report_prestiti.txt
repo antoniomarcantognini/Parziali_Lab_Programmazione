@@ -1,5 +1,4 @@
 === REPORT PRESTITI ATTIVI ===
-ID Prestito: 1431655779 | ISBN:  | Titolo: Titolo non trovato | ID Utente: 1 | Nome: Utente sconosciuto | Data Prestito: 29/11/2025 | Restituzione Prevista: 29/12/2025
 ID Prestito: 3 | ISBN: 444-5-6666-7777-8 | Titolo: Titolo 4 | ID Utente: 4 | Nome: Utente sconosciuto | Data Prestito: 25/07/2025 | Restituzione Prevista: 24/08/2025
 ID Prestito: 4 | ISBN: 444-5-6666-7777-8 | Titolo: Titolo 4 | ID Utente: 3 | Nome: Utente sconosciuto | Data Prestito: 25/06/2025 | Restituzione Prevista: 25/07/2025
 ID Prestito: 5 | ISBN: 444-5-6666-7777-8 | Titolo: Titolo 4 | ID Utente: 5 | Nome: Utente sconosciuto | Data Prestito: 20/04/2025 | Restituzione Prevista: 20/05/2025
