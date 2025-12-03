@@ -350,6 +350,18 @@ void salva_database_su_file_binario(Libro *libri, int num_libri, Utente *utenti,
 
 // funzione carica database da file binario
 int carica_database_da_file_binario(Libro **libri, int *num_libri, int *cap_libri, Utente **utenti, int *num_utenti, int *cap_utenti, Prestito **prestiti, int *num_prestiti, int *cap_prestiti) {
+    char scelta;
+    if(*num_libri != 0 || *num_utenti != 0 || *num_prestiti != 0){
+        printf("=== ATTENZIONE ===\n\n");
+        printf("Vuoi caricare il database? I database attualmente caricati saranno cancellati - - -  (S/N) \n");
+        printf("La tua scelta: \n");
+        scanf("%c",&scelta);
+        // Se l'utente non digita 'S' o 's', annullo l'operazione
+        if (scelta != 'S' && scelta != 's') {
+            printf("Operazione annullata. Ritorno al menu.\n");
+            return 0; // Esco dalla funzione senza fare nulla
+        }
+    }
     FILE *fp;
     int temp_num;
 
